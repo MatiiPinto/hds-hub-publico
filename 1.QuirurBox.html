@@ -542,6 +542,7 @@ table.excel-tbl tr:nth-child(even) td{background:#f8fafc}
     <div class="modal-title-area"><div class="modal-title" id="modalTitle"></div><div class="modal-specialty" id="modalSpecialty"></div></div>
     <div class="modal-info-grid" id="modalInfoGrid"></div>
     <div class="modal-supplier" id="modalSupplier"></div>
+    <div class="modal-catalog" id="modalCatalog"></div>
     <div class="modal-pieces" id="modalPieces"></div>
   </div>
 </div>
@@ -966,6 +967,18 @@ function openModal(id){
   } else {
     suppEl.style.display='none';
   }
+
+  // Catálogo del proveedor real (galería a nivel de caja)
+  const catEl=document.getElementById('modalCatalog');
+  if(b.catalog_imgs&&b.catalog_imgs.length){
+    catEl.style.display='block';
+    catEl.innerHTML=
+      `<div class="section-title" style="margin:6px 0 8px">📋 Catálogo del proveedor</div>`
+      +(b.provider_note?`<div style="font-size:12px;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-left:3px solid #1a6b8a;border-radius:6px;padding:9px 12px;margin-bottom:10px;line-height:1.5">${b.provider_note}</div>`:'')
+      +`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">`
+      +b.catalog_imgs.map(im=>`<button onclick="showPieceImg('${im.url}')" title="Ampliar" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;background:#fff;cursor:pointer;padding:0;text-align:left"><img src="${im.url}" alt="${im.label||''}" style="width:100%;height:96px;object-fit:cover;display:block"><div style="font-size:11px;color:#475569;padding:6px 8px;font-weight:600">${im.label||''}</div></button>`).join('')
+      +`</div>`;
+  } else { catEl.style.display='none'; }
 
   // Piezas
   const piecesEl=document.getElementById('modalPieces');
