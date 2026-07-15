@@ -497,6 +497,12 @@ table.excel-tbl tr:nth-child(even) td{background:#f8fafc}
   <div class="stat-item"><div class="stat-icon-wrap" style="background:#eff6ff"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2z" stroke="#1d4ed8" stroke-width="1.6"/><path d="M10 6v4l3 2" stroke="#1d4ed8" stroke-width="1.6" stroke-linecap="round"/></svg></div><div class="stat-text"><span class="stat-num" style="color:#1d4ed8">7</span><span class="stat-label">Especialidades</span></div></div>
 
 
+
+  <div class="stat-item"><div class="stat-icon-wrap" style="background:#f5f3ff"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" stroke="#6d28d9" stroke-width="1.6"/><rect x="11" y="2" width="7" height="7" rx="1.5" stroke="#6d28d9" stroke-width="1.6"/><rect x="2" y="11" width="7" height="7" rx="1.5" stroke="#6d28d9" stroke-width="1.6"/><rect x="11" y="11" width="7" height="7" rx="1.5" stroke="#6d28d9" stroke-width="1.6"/></svg></div><div class="stat-text"><span class="stat-num" style="color:#6d28d9">196</span><span class="stat-label">Tipologías</span></div></div>
+  <div class="stat-item"><div class="stat-icon-wrap" style="background:#ecfdf5"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 8l6-4 6 4v8a1 1 0 01-1 1H5a1 1 0 01-1-1V8z" stroke="#059669" stroke-width="1.6"/><path d="M8 17v-6h4v6" stroke="#059669" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stat-text"><span class="stat-num" style="color:#059669">1.507</span><span class="stat-label">Cajas físicas</span></div></div>
+  <div class="stat-item"><div class="stat-icon-wrap" style="background:#fff7ed"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="3" fill="#d97706"/><path d="M10 3v2M10 15v2M3 10h2M15 10h2M5.05 5.05l1.41 1.41M13.54 13.54l1.41 1.41M5.05 14.95l1.41-1.41M13.54 6.46l1.41-1.41" stroke="#d97706" stroke-width="1.6" stroke-linecap="round"/></svg></div><div class="stat-text"><span class="stat-num" style="color:#d97706">60.124</span><span class="stat-label">Piezas totales</span></div></div>
+</div></div>
+
 <!-- CRONOGRAMA REVISIÓN INSTRUMENTAL Qx (jun-oct 26) -->
 <div class="crono-bar">
   <div class="crono-title">Cronograma<br>de Revisión<div class="crono-title-sub">Email SSMO · 02-06-26</div></div>
@@ -517,11 +523,6 @@ table.excel-tbl tr:nth-child(even) td{background:#f8fafc}
     <div class="crono-modal-body" id="cronoModalBody"></div>
   </div>
 </div>
-
-  <div class="stat-item"><div class="stat-icon-wrap" style="background:#f5f3ff"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" stroke="#6d28d9" stroke-width="1.6"/><rect x="11" y="2" width="7" height="7" rx="1.5" stroke="#6d28d9" stroke-width="1.6"/><rect x="2" y="11" width="7" height="7" rx="1.5" stroke="#6d28d9" stroke-width="1.6"/><rect x="11" y="11" width="7" height="7" rx="1.5" stroke="#6d28d9" stroke-width="1.6"/></svg></div><div class="stat-text"><span class="stat-num" style="color:#6d28d9">196</span><span class="stat-label">Tipologías</span></div></div>
-  <div class="stat-item"><div class="stat-icon-wrap" style="background:#ecfdf5"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 8l6-4 6 4v8a1 1 0 01-1 1H5a1 1 0 01-1-1V8z" stroke="#059669" stroke-width="1.6"/><path d="M8 17v-6h4v6" stroke="#059669" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stat-text"><span class="stat-num" style="color:#059669">1.507</span><span class="stat-label">Cajas físicas</span></div></div>
-  <div class="stat-item"><div class="stat-icon-wrap" style="background:#fff7ed"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="3" fill="#d97706"/><path d="M10 3v2M10 15v2M3 10h2M15 10h2M5.05 5.05l1.41 1.41M13.54 13.54l1.41 1.41M5.05 14.95l1.41-1.41M13.54 6.46l1.41-1.41" stroke="#d97706" stroke-width="1.6" stroke-linecap="round"/></svg></div><div class="stat-text"><span class="stat-num" style="color:#d97706">60.124</span><span class="stat-label">Piezas totales</span></div></div>
-</div></div>
 
 <div class="filters-bar">
   <span class="filter-label">Especialidad</span>
@@ -568,14 +569,13 @@ const BOXES = window.QUIRURBOX_BOXES;
 (function renderHeaderStats(){
   function run(){
     const el=document.getElementById('statsInner'); if(!el||!Array.isArray(BOXES)) return;
-    // Cantidades físicas OFICIALES (Instrumental Resumen.xlsx, 196 cajas) — la data
-    // por-caja de la plataforma no las refleja. Base oficial + cajas agregadas manualmente.
-    const OFICIAL_CAJAS=1514, OFICIAL_PIEZAS=60006;
-    const manuales = BOXES.filter(b=>b.fuente==='manual');
+    // Totales calculados DESDE los datos por caja (box_qty/total_pieces ya son los
+    // oficiales del Instrumental Resumen.xlsx) — una sola fuente, sin hardcodes:
+    // el header, las tarjetas y el modal siempre cuadran.
     const familias = new Set(BOXES.map(b=>b.specialty).filter(Boolean)).size;
     const tipologias = BOXES.length;
-    const cajas = OFICIAL_CAJAS + manuales.reduce((s,b)=>s+(+b.box_qty||0),0);
-    const instrumental = OFICIAL_PIEZAS + manuales.reduce((s,b)=>s+(+b.box_qty||0)*(b.pieces||[]).reduce((a,p)=>a+(+p.qty||0),0),0);
+    const cajas = BOXES.reduce((s,b)=>s+(+b.box_qty||0),0);
+    const instrumental = BOXES.reduce((s,b)=>s+(+b.total_pieces||0),0);
     const nf=n=>n.toLocaleString('es-CL');
     const items=[
       ['Familias',     familias,    '#7c3aed','#f5f3ff','🗂'],
