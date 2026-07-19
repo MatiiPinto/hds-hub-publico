@@ -8,7 +8,7 @@
 //
 // Para invalidar TODO el caché de los visitantes: subir la versión de CACHE.
 // ════════════════════════════════════════════════════════════════════════════
-const CACHE = 'minihub-hds-v1';
+const CACHE = 'hds-hub-publico-v1';
 
 self.addEventListener('install', e => { self.skipWaiting(); });
 

@@ -11,7 +11,7 @@
 //   3. Implementar → Nueva implementación → tipo "Aplicación web":
 //        · Ejecutar como: Yo
 //        · Acceso: Cualquier persona
-//   4. Copiar la URL /exec y pegarla en metrics.js → METRICS_URL (repo minihub-hds).
+//   4. Copiar la URL /exec y pegarla en metrics.js → METRICS_URL (repo hds-hub-publico).
 //
 // Eventos que llegan:
 //   visita       → apertura de una plataforma (detalle: especialidad/sistema si
