@@ -140,7 +140,7 @@ header .sub{font-size:11px;color:var(--muted)}
 <body>
 
 <header>
-  <a class="hub-back" href="0.HUB.html" title="Volver al HUB">← HUB</a>
+  <a class="hub-back" href="index.html" title="Volver al HUB">← HUB</a>
   <div class="logo">✉️</div>
   <div>
     <h1>Correo Neumático · HDS</h1>
@@ -550,6 +550,7 @@ renderKpis(); fillFilters(); renderDir();
 applyPublicMode(); applyUrlFilter();
 document.getElementById('hdrSub').textContent = `${EST.length} estaciones · ${Object.keys(SYS).length} sistemas · ${uniq(EST.map(e=>e.edificio)).length} edificios`;
 </script>
+<script src="hub-home.js"></script>
 
 <script src="metrics.js"></script>
 <script>if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){navigator.serviceWorker.register('sw.js').catch(function(){});}</script>
