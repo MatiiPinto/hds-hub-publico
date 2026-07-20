@@ -34,6 +34,9 @@ main{max-width:1000px;margin:0 auto;padding:48px 24px 80px;background:#fff url('
 .pcard-icon svg{width:48px;height:48px;color:#ccfbf1;}
 .pcard-foot{padding:13px 16px 14px;display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.3);}
 .pcard-name{font-size:.86rem;font-weight:600;color:rgba(255,255,255,.85);letter-spacing:.03em;}
+.pcard--soon{opacity:.5;filter:grayscale(.55);cursor:not-allowed;pointer-events:none;box-shadow:0 2px 10px rgba(29,45,91,.10);}
+.pcard--soon .pcard-arrow{display:none;}
+.pcard--soon::after{content:'PRÓXIMAMENTE';position:absolute;top:10px;right:10px;background:rgba(29,45,91,.9);color:#fff;font-size:.58rem;font-weight:800;letter-spacing:.1em;padding:4px 10px;border-radius:999px;z-index:3;}
 .pcard-arrow{color:var(--cyan);font-size:1rem;opacity:.8;}
 footer{background:var(--navy2);border-top:1px solid rgba(255,255,255,.07);padding:16px 40px;display:flex;align-items:center;justify-content:space-between;font-size:.66rem;color:var(--gray2);}
 /* ── Misión / Visión (sutil, bajo las plataformas) ── */
@@ -86,7 +89,7 @@ footer{background:var(--navy2);border-top:1px solid rgba(255,255,255,.07);paddin
       <div class="pcard-foot"><span class="pcard-name">Equipamiento Médico</span><span class="pcard-arrow">→</span></div>
     </a>
 
-    <a class="pcard" href="3.QuiroBox.html" title="QuiroBox — Equipamiento de pabellones quirúrgicos">
+    <a class="pcard pcard--soon" title="QuiroBox · Pabellones — próximamente disponible">
       <img class="pcard-img" src="assets/hub_4.jpg" alt="QuiroBox">
       <div class="pcard-foot"><span class="pcard-name">QuiroBox · Pabellones</span><span class="pcard-arrow">&#8594;</span></div>
     </a>
@@ -101,7 +104,12 @@ footer{background:var(--navy2);border-top:1px solid rgba(255,255,255,.07);paddin
       <div class="pcard-foot"><span class="pcard-name">Correo Neumático</span><span class="pcard-arrow">&#8594;</span></div>
     </a>
 
-    <a class="pcard" href="26.ManualBuenasPracticas.html" title="Manual de Buenas Prácticas">
+    <a class="pcard" href="31.EsterilizacionLibroRojo.html" title="Libro Rojo · Guía de esterilización para personal y arsenaleras">
+      <div class="pcard-icon" style="background:linear-gradient(135deg,#b91c1c 0%,#7f1d1d 100%)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+      <div class="pcard-foot"><span class="pcard-name">Libro Rojo · Esterilización</span><span class="pcard-arrow">&#8594;</span></div>
+    </a>
+
+    <a class="pcard pcard--soon" title="Buenas Prácticas — próximamente disponible">
       <div class="pcard-icon" style="background:linear-gradient(135deg,#059669 0%,#065f46 100%)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 12l2 2 4-4"/></svg></div>
       <div class="pcard-foot"><span class="pcard-name">Buenas Prácticas</span><span class="pcard-arrow">&#8594;</span></div>
     </a>
