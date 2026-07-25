@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PAPS — Hospital del Salvador · INGER</title>
+<link rel="icon" type="image/x-icon" href="Logos%20HUB-HDS/favicon-hds.ico">
+<link rel="icon" type="image/png" sizes="256x256" href="Logos%20HUB-HDS/favicon-hds.png">
+<link rel="shortcut icon" href="Logos%20HUB-HDS/favicon-hds.ico">
+<link rel="apple-touch-icon" href="Logos%20HUB-HDS/favicon-hds-180.png">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --azul:#1D2D5B; --cyan:#29aae2;
+  --c1:#0d9488; --c2:#b45309; --c3:#1D2D5B;
+  --ink:#1e293b; --mute:#64748b; --soft:#94a3b8;
+  --line:#e2e8f0; --bg:#f1f5f9;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+button,input,select{font-family:inherit}
+
+/* ── HEADER ── */
+header{background:var(--azul);color:#fff;padding:12px 24px;display:flex;align-items:center;gap:14px;box-shadow:0 3px 12px rgba(0,0,0,.28);position:sticky;top:0;z-index:60}
+.hub-back{background:rgba(41,170,226,.12);border:1px solid rgba(41,170,226,.3);color:var(--cyan);padding:7px 13px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;flex-shrink:0;display:flex;align-items:center;gap:6px;transition:all .15s}
+.hub-back:hover{background:rgba(41,170,226,.22);color:#fff}
+.hub-back svg{width:14px;height:14px}
+.logo-box{width:42px;height:42px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0}
+.hd-title h1{font-size:17px;font-weight:800;letter-spacing:-.3px;line-height:1.15}
+.hd-title p{font-size:10.5px;opacity:.7;margin-top:2px}
+.hd-chips{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.hchip{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:4px 11px;font-size:11px;font-weight:600;white-space:nowrap}
+.hchip b{font-weight:800}
+
+/* ── BARRA GLOBAL DE BÚSQUEDA ── */
+.gbar{background:#16244a;padding:9px 24px;display:flex;gap:10px;align-items:center;position:sticky;top:66px;z-index:58;border-bottom:1px solid rgba(255,255,255,.08)}
+.gsearch{flex:1;position:relative;display:flex;align-items:center;max-width:720px}
+.gsearch svg{position:absolute;left:11px;width:15px;height:15px;color:#7f93c4;pointer-events:none}
+#q{width:100%;padding:9px 34px 9px 34px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);color:#fff;font-size:13.5px;outline:none;transition:.15s}
+#q::placeholder{color:#8ea0c9}
+#q:focus{background:rgba(255,255,255,.13);border-color:var(--cyan)}
+.qclear{position:absolute;right:9px;background:none;border:none;cursor:pointer;color:#8ea0c9;font-size:14px;display:none}
+.kbd{font-size:10px;color:#7f93c4;border:1px solid rgba(255,255,255,.16);border-radius:5px;padding:2px 6px;font-weight:700;flex-shrink:0}
+.vtabs{display:flex;gap:2px;margin-left:auto;flex-shrink:0}
+.vtab{background:none;border:none;color:#a9b8dc;font-size:12px;font-weight:700;padding:7px 13px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap}
+.vtab:hover{background:rgba(255,255,255,.08);color:#fff}
+.vtab.on{background:var(--cyan);color:#062033}
+
+/* ── FILTROS ── */
+.frow{background:#fff;border-bottom:1px solid var(--line);padding:8px 24px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.flab{font-size:10px;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;margin-right:2px}
+.fbtn{padding:4px 11px;border-radius:16px;border:1.5px solid var(--line);background:#fff;font-size:11px;font-weight:600;color:#475569;cursor:pointer;transition:.15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.fbtn:hover{border-color:var(--soft);color:var(--ink)}
+.fbtn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.fbtn .n{font-size:9.5px;opacity:.65;font-weight:700}
+.fsep{width:1px;height:18px;background:var(--line);margin:0 4px}
+
+/* ── MAIN ── */
+main{padding:20px 24px 60px;max-width:1560px;margin:0 auto}
+.view{display:none}
+.view.on{display:block}
+.empty{text-align:center;padding:64px 20px;color:var(--soft)}
+.empty h3{font-size:15px;color:var(--mute);margin-bottom:6px}
+.empty p{font-size:12.5px}
+
+/* ── TARJETAS DE SERVICIO ── */
+.catsec{margin-bottom:30px}
+.cathdr{display:flex;align-items:center;gap:12px;margin-bottom:13px;padding:10px 16px;border-radius:10px;border-left:4px solid var(--cc);background:color-mix(in srgb,var(--cc) 7%,white)}
+.cathdr-t{font-size:11.5px;font-weight:800;color:var(--cc);text-transform:uppercase;letter-spacing:.07em}
+.cathdr-s{font-size:11px;color:var(--mute);margin-top:1px}
+.cathdr-p{margin-left:auto;background:var(--cc);color:#fff;border-radius:20px;padding:3px 10px;font-size:10.5px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:13px}
+.scard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px;cursor:pointer;border-left:4px solid var(--cc);transition:transform .15s,box-shadow .15s}
+.scard:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.11)}
+.scard.hide{display:none}
+.sc-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px}
+.sc-num{width:36px;height:36px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;background:var(--cc)}
+.sc-id{font-size:9px;font-weight:700;color:var(--cc);text-transform:uppercase;letter-spacing:.08em}
+.sc-name{font-size:13px;font-weight:700;line-height:1.25;margin-top:1px}
+.sc-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px}
+.badge{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:10px}
+.b-frozen{background:#dcfce7;color:#15803d}
+.b-update{background:#fef3c7;color:#b45309}
+.b-dev{background:#f1f5f9;color:#64748b}
+.b-version{background:#e0f2fe;color:#0369a1;font-family:ui-monospace,monospace}
+.b-missing{background:#fee2e2;color:#991b1b}
+.b-doc{background:#ede9fe;color:#6d28d9}
+.sc-stats{display:flex;gap:5px;flex-wrap:wrap;font-size:10px;color:var(--mute)}
+.sc-stats b{color:var(--ink);font-size:11px}
+.sc-foot{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);display:flex;align-items:center;gap:8px;font-size:10.5px;color:var(--mute)}
+.sc-open{margin-left:auto;color:var(--cc);font-weight:800;font-size:10.5px}
+.nodoc{opacity:.62}
+
+/* ── RESULTADOS DE BÚSQUEDA ── */
+.rhead{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.rhead h2{font-size:15px;font-weight:800}
+.rhead .sub{font-size:12px;color:var(--mute)}
+.rlist{display:flex;flex-direction:column;gap:9px}
+.rcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;border-left:3px solid var(--cc);transition:.13s}
+.rcard:hover{border-color:var(--cc);box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.r-top{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:6px}
+.r-svc{font-size:9.5px;font-weight:800;color:#fff;background:var(--cc);border-radius:5px;padding:2px 7px;letter-spacing:.03em}
+.r-crumb{font-size:10.5px;color:var(--soft);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.r-kind{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:5px;background:#f1f5f9;color:var(--mute)}
+.r-kind.k-h{background:#e0e7ff;color:#3730a3}
+.r-kind.k-tbl{background:#fef3c7;color:#92400e}
+.r-kind.k-img{background:#dcfce7;color:#166534}
+.r-txt{font-size:13px;line-height:1.5;color:#334155}
+.r-txt mark{background:#fde68a;color:#78350f;padding:0 2px;border-radius:2px;font-weight:600}
+.r-score{font-size:9px;color:var(--soft);font-weight:800;text-transform:uppercase;letter-spacing:.05em;background:#f8fafc;border:1px solid var(--line);border-radius:5px;padding:2px 7px;white-space:nowrap}
+.more{margin:16px auto 0;display:block;padding:9px 22px;border-radius:9px;border:1.5px solid var(--line);background:#fff;font-size:12.5px;font-weight:700;color:var(--mute);cursor:pointer}
+.more:hover{border-color:var(--soft);color:var(--ink)}
+
+/* ── LECTOR DE DOCUMENTO ── */
+.reader{display:grid;grid-template-columns:288px 1fr;gap:18px;align-items:start}
+.toc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 8px 12px 12px;position:sticky;top:132px;max-height:calc(100vh - 152px);overflow-y:auto}
+.toc-h{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--soft);padding:0 4px 8px;border-bottom:1px solid var(--line);margin-bottom:7px}
+.toc a{display:block;font-size:11.5px;color:#475569;text-decoration:none;padding:3.5px 6px;border-radius:6px;line-height:1.3;border-left:2px solid transparent}
+.toc a:hover{background:#f8fafc;color:var(--ink)}
+.toc a.on{background:color-mix(in srgb,var(--cc) 10%,white);color:var(--cc);font-weight:700;border-left-color:var(--cc)}
+.toc a.l1{font-weight:800;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;margin-top:8px;color:var(--azul)}
+.toc a.l2{font-weight:700;padding-left:10px}
+.toc a.l3{padding-left:20px;font-size:11px}
+.toc a.l4{padding-left:30px;font-size:10.5px;color:var(--mute)}
+.toc a.l5{padding-left:38px;font-size:10.5px;color:var(--soft)}
+.doc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:24px 30px 60px;min-width:0}
+.doc-hd{border-bottom:2px solid var(--cc);padding-bottom:14px;margin-bottom:20px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.doc-hd .n{width:46px;height:46px;border-radius:10px;background:var(--cc);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0}
+.doc-hd h2{font-size:19px;font-weight:800;line-height:1.15}
+.doc-hd .meta{font-size:11.5px;color:var(--mute);margin-top:3px}
+.doc-tools{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+h1.d,h2.d,h3.d,h4.d,h5.d{scroll-margin-top:150px;line-height:1.25}
+h1.d{font-size:17px;font-weight:800;color:var(--azul);margin:30px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line);text-transform:uppercase;letter-spacing:.02em}
+h2.d{font-size:15.5px;font-weight:800;color:var(--cc);margin:24px 0 9px}
+h3.d{font-size:14px;font-weight:800;margin:19px 0 7px}
+h4.d{font-size:12.8px;font-weight:700;color:#334155;margin:15px 0 5px}
+h5.d{font-size:12px;font-weight:700;color:var(--mute);margin:12px 0 4px}
+p.d{font-size:13.2px;line-height:1.62;margin:0 0 9px;color:#334155;max-width:78ch}
+ul.dl{margin:0 0 11px 0;padding:0}
+li.d{font-size:13.2px;line-height:1.6;margin:0 0 5px 22px;color:#334155;max-width:76ch;list-style:disc}
+.doc mark{background:#fde68a;color:#78350f;border-radius:2px;padding:0 1px}
+.tblwrap{overflow-x:auto;margin:12px 0 16px;border:1px solid var(--line);border-radius:9px}
+table.ptbl{border-collapse:collapse;width:100%;font-size:12px}
+table.ptbl th{background:#f8fafc;color:#334155;font-weight:800;text-align:left;padding:7px 10px;border-bottom:2px solid var(--line);position:sticky;top:0;font-size:11px;text-transform:uppercase;letter-spacing:.03em}
+table.ptbl td{padding:6px 10px;border-bottom:1px solid #f1f5f9;vertical-align:top;line-height:1.45;color:#334155}
+table.ptbl tr:last-child td{border-bottom:none}
+table.ptbl tr:nth-child(even) td{background:#fcfdfe}
+table.ptbl tr.hit td{background:#fffbeb}
+.tblcap{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--soft);margin-bottom:4px}
+.figure{margin:14px 0 18px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px;text-align:center}
+.figure img,.figure object{max-width:100%;height:auto}
+.figure.flow{background:#fcfdff}
+.figcap{font-size:10.5px;color:var(--soft);margin-top:7px;font-style:italic}
+.zoom{cursor:zoom-in}
+.pcode{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.93em;color:#0369a1;background:#f0f9ff;border:1px solid #bae6fd;border-radius:5px;padding:0 4px;cursor:pointer;white-space:nowrap}
+.pcode:hover{background:#e0f2fe;border-color:#7dd3fc}
+.acro{border-bottom:1px dotted #94a3b8;cursor:help}
+
+/* ── AUDITORÍA ── */
+.aud-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin-bottom:18px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:11px;padding:13px 15px;border-top:3px solid var(--kc,#64748b)}
+.kpi .kn{font-size:26px;font-weight:800;line-height:1;color:var(--kc,#1e293b);font-variant-numeric:tabular-nums}
+.kpi .kl{font-size:11px;color:var(--mute);margin-top:4px;font-weight:600}
+.aud-sec{background:#fff;border:1px solid var(--line);border-radius:12px;padding:17px 19px;margin-bottom:16px}
+.aud-sec h3{font-size:13.5px;font-weight:800;margin-bottom:3px}
+.aud-sec .as-sub{font-size:11.5px;color:var(--mute);margin-bottom:13px}
+.cov{overflow:auto}
+table.cov{border-collapse:collapse;font-size:11.5px;width:100%}
+table.cov th{padding:6px 7px;font-size:10px;font-weight:800;color:var(--mute);text-align:center;white-space:nowrap}
+table.cov th.rowh{text-align:left;font-weight:700;color:#334155;font-size:11.5px;padding-right:12px;white-space:normal;min-width:190px}
+table.cov td{text-align:center;border:1px solid #f1f5f9;padding:5px 4px;font-size:13px;line-height:1}
+table.cov td.yes{background:#ecfdf5;color:#059669;cursor:pointer}
+table.cov td.yes:hover{background:#d1fae5}
+table.cov td.no{background:#fef2f2;color:#fca5a5}
+table.cov tr:hover td{outline:1px solid #e2e8f0}
+.cov-n{font-size:10px;font-weight:800;color:var(--mute)}
+.find{border-left:3px solid var(--fc,#94a3b8);background:#fff;border:1px solid var(--line);border-left-width:3px;border-radius:9px;padding:10px 13px;margin-bottom:8px}
+.find .ft{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.find .sev{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:5px;color:#fff;background:var(--fc)}
+.find .dim{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--soft)}
+.find .tt{font-size:12.5px;font-weight:700}
+.find .dd{font-size:12.5px;line-height:1.5;color:#475569}
+.find .go{font-size:11px;font-weight:800;color:var(--cyan);cursor:pointer;margin-left:auto}
+.sev-alta{--fc:#dc2626}.sev-media{--fc:#d97706}.sev-baja{--fc:#94a3b8}
+.dl2{font-size:12.5px;line-height:1.55;color:#475569;padding:8px 0;border-bottom:1px dashed var(--line)}
+.dl2:last-child{border-bottom:none}
+.dl2 b{color:var(--ink)}
+.varchip{display:inline-block;font-size:11px;background:#f8fafc;border:1px solid var(--line);border-radius:6px;padding:2px 8px;margin:2px 3px 0 0;color:#475569}
+
+/* ── COMPARADOR ── */
+.cmpbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.cmp-t{padding:6px 13px;border-radius:9px;border:1.5px solid var(--line);background:#fff;font-size:12px;font-weight:700;color:#475569;cursor:pointer}
+.cmp-t:hover{border-color:var(--soft)}
+.cmp-t.on{background:var(--azul);border-color:var(--azul);color:#fff}
+.cmp-t .n{font-size:10px;opacity:.7;margin-left:4px}
+.cmpwrap{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:auto;max-height:calc(100vh - 260px)}
+table.cmp{border-collapse:collapse;width:100%;font-size:12px}
+table.cmp th{background:#f8fafc;position:sticky;top:0;z-index:2;text-align:left;padding:8px 11px;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#475569;border-bottom:2px solid var(--line)}
+table.cmp td{padding:7px 11px;border-bottom:1px solid #f1f5f9;vertical-align:top;line-height:1.45}
+table.cmp tr:hover td{background:#f8fafc}
+.cmp-svc{font-size:9.5px;font-weight:800;color:#fff;border-radius:5px;padding:2px 7px;white-space:nowrap;display:inline-block}
+.cmp-go{color:var(--cyan);cursor:pointer;font-weight:800;font-size:11px;white-space:nowrap}
+
+/* ── TEMA TRANSVERSAL ── */
+.themegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.tcard{background:#fff;border:1px solid var(--line);border-radius:11px;border-top:3px solid var(--cc);padding:13px 15px}
+.tcard h4{font-size:12.5px;font-weight:800;margin-bottom:2px}
+.tcard .tc-sub{font-size:10.5px;color:var(--soft);margin-bottom:9px}
+.tcard .tc-hit{font-size:12px;line-height:1.5;color:#475569;padding:7px 0;border-top:1px dashed var(--line);cursor:pointer}
+.tcard .tc-hit:hover{color:var(--ink)}
+.tcard .tc-hit mark{background:#fde68a;color:#78350f;border-radius:2px}
+.tcard .tc-none{font-size:11.5px;color:#cbd5e1;font-style:italic;padding-top:7px;border-top:1px dashed var(--line)}
+.tc-n{float:right;font-size:10px;font-weight:800;color:var(--cc);background:color-mix(in srgb,var(--cc) 12%,white);border-radius:10px;padding:1px 8px}
+
+/* ── CRUCES ── */
+.xgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media(max-width:1100px){.xgrid{grid-template-columns:1fr}}
+.panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.panel h3{font-size:13px;font-weight:800;margin-bottom:3px}
+.panel .ph-sub{font-size:11.5px;color:var(--mute);margin-bottom:12px}
+.matrix{overflow:auto}
+table.mx{border-collapse:collapse;font-size:11px}
+table.mx th{padding:4px 5px;font-size:9.5px;font-weight:800;color:var(--mute);white-space:nowrap}
+table.mx th.rot{height:96px;vertical-align:bottom}
+table.mx th.rot>div{writing-mode:vertical-rl;transform:rotate(180deg);text-align:left}
+table.mx td{width:22px;height:22px;text-align:center;border:1px solid #f1f5f9;cursor:pointer}
+table.mx td.on{background:var(--cyan);border-color:#1a8fc4}
+table.mx td.self{background:#f1f5f9;cursor:default}
+table.mx td.on:hover{background:var(--azul)}
+table.mx th.rowh{text-align:right;padding-right:8px;font-weight:800;color:#475569}
+.plat-chips{display:flex;gap:6px;flex-wrap:wrap}
+.plat{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:#334155;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:6px 11px;text-decoration:none;transition:.14s}
+.plat:hover{border-color:var(--cyan);color:var(--azul);background:#f0f9ff}
+.plat .pdot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}
+.normlist{max-height:420px;overflow:auto}
+.norm{font-size:12px;line-height:1.45;padding:7px 0;border-bottom:1px dashed var(--line);color:#475569}
+.norm:last-child{border-bottom:none}
+.norm .ns{font-size:9px;font-weight:800;color:#fff;border-radius:4px;padding:1px 6px;margin-right:6px;vertical-align:1px}
+
+/* ── LIGHTBOX ── */
+.lbox{display:none;position:fixed;inset:0;background:rgba(8,15,30,.9);z-index:300;padding:26px;cursor:zoom-out;overflow:auto}
+.lbox.open{display:flex;align-items:center;justify-content:center}
+.lbox img,.lbox object{max-width:96vw;max-height:92vh;background:#fff;border-radius:8px}
+.lbox-x{position:fixed;top:16px;right:20px;color:#fff;font-size:26px;background:none;border:none;cursor:pointer;opacity:.8}
+
+.loading{text-align:center;padding:70px;color:var(--soft);font-size:13px}
+.warn{background:#fef3c7;border:1px solid #fcd34d;color:#92400e;border-radius:10px;padding:12px 16px;font-size:12.5px;margin-bottom:16px}
+.warn b{font-weight:800}
+@media(max-width:960px){
+  .reader{grid-template-columns:1fr}
+  .toc{position:static;max-height:260px}
+  .gbar{flex-wrap:wrap}
+  .vtabs{width:100%;margin-left:0;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="hub-back" title="Volver al HUB">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    HUB
+  </a>
+  <div class="logo-box">PAPS</div>
+  <div class="hd-title">
+    <h1>Programa Anual de Prestación de Servicio</h1>
+    <p>Hospital del Salvador · INGER — Servicios Concesionados CSSO</p>
+  </div>
+  <div class="hd-chips" id="statsChips"></div>
+</header>
+
+<div class="gbar">
+  <div class="gsearch">
+    <svg viewBox="0 0 20 20" fill="currentColor"><path d="M12.9 14.32a8 8 0 1 1 1.41-1.41l5.35 5.33-1.42 1.42-5.33-5.34zm-.06-4.32a6 6 0 1 0-12 0 6 6 0 0 0 12 0z"/></svg>
+    <input id="q" type="text" autocomplete="off" spellcheck="false"
+           placeholder="Buscar en los 13 PAPS: incendio, stock crítico, ransomware, vida útil, turno…">
+    <button class="qclear" id="qclear" title="Limpiar">✕</button>
+  </div>
+  <span class="kbd">/</span>
+  <div class="vtabs">
+    <button class="vtab on" data-v="servicios">Servicios</button>
+    <button class="vtab" data-v="buscar">Búsqueda</button>
+    <button class="vtab" data-v="comparar">Comparador</button>
+    <button class="vtab" data-v="tema">Tema transversal</button>
+    <button class="vtab" data-v="cruces">Cruces</button>
+    <button class="vtab" data-v="auditoria">Auditoría</button>
+  </div>
+</div>
+
+<div class="frow" id="frow"></div>
+
+<main>
+  <!-- SERVICIOS -->
+  <div class="view on" id="v-servicios">
+    <div id="svcCats"></div>
+  </div>
+
+  <!-- BÚSQUEDA -->
+  <div class="view" id="v-buscar">
+    <div class="rhead"><h2 id="rTitle">Búsqueda</h2><span class="sub" id="rSub"></span></div>
+    <div class="rlist" id="rList"></div>
+    <button class="more" id="rMore" style="display:none">Ver más resultados</button>
+  </div>
+
+  <!-- COMPARADOR -->
+  <div class="view" id="v-comparar">
+    <div class="cmpbar" id="cmpBar"></div>
+    <div class="rhead"><span class="sub" id="cmpSub"></span></div>
+    <div class="cmpwrap"><table class="cmp" id="cmpTbl"></table></div>
+  </div>
+
+  <!-- TEMA TRANSVERSAL -->
+  <div class="view" id="v-tema">
+    <div class="rhead"><h2 id="tTitle">Tema transversal</h2><span class="sub" id="tSub"></span></div>
+    <div class="themegrid" id="themeGrid"></div>
+  </div>
+
+  <!-- CRUCES -->
+  <div class="view" id="v-cruces">
+    <div class="xgrid" id="xGrid"></div>
+  </div>
+
+  <!-- AUDITORÍA -->
+  <div class="view" id="v-auditoria">
+    <div id="audHost"></div>
+  </div>
+
+  <!-- LECTOR -->
+  <div class="view" id="v-doc">
+    <div class="reader">
+      <nav class="toc" id="toc"></nav>
+      <article class="doc" id="docBody"></article>
+    </div>
+  </div>
+</main>
+
+<div class="lbox" id="lbox"><button class="lbox-x" id="lboxX">✕</button><span id="lboxIn"></span></div>
+
+<script src="SHARED_DATA/paps_full.js"></script>
+<script src="SHARED_DATA/paps_audit.js"></script>
+<script src="SHARED_DATA/acronimos.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   PAPS · Hospital del Salvador — plataforma de consulta integral
+   Corpus: 13 documentos PAPS (.docx) → SHARED_DATA/paps_full.js
+   ═══════════════════════════════════════════════════════════════════ */
+
+var PAPS = window.SHARED_PAPS || null;
+var ASSETS = 'PAPS_DATA/';
+
+var CAT_COLOR = {1:'#0d9488', 2:'#b45309', 3:'#1D2D5B'};
+var CAT_NAME  = {1:'No Clínico de Apoyo', 2:'Servicio Básico', 3:'Especial Obligatorio'};
+var CAT_ICON  = {1:'🧹', 2:'🏗️', 3:'⭐'};
+
+var SERVICES = [
+  // ── CATEGORÍA 1: NO CLÍNICOS DE APOYO ──
+  {num:"01",id:"AS",cat:1,short:"Aseo y Limpieza General",version:"1",status:"Congelado",
+   total_files:74,files_pdf:9,files_xls:25,files_doc:39,
+   counts:{proc_op:14,proc_adm:4,proc_cg:8,forms:20,flowcharts:5,job_desc:8,training:1,main_docs:2},total_procs:26,
+   procs_op:["Reposición de insumos en recintos","Limpieza y desinfección de carros","Recepción de equipos e insumos","Aseo tipo I — Mantención operativa","Aseo tipo II — Intervención terminal","Aseo tipo III — Limpieza profunda regular","Aseo tipo III — Limpieza terminal profunda","Aseo con doble balde","Aseo en residencias","Gestión de insumos","Manejo de residuos","Aseo con microfibra","Higiene del personal","Limpieza de derrame de residuos"],
+   procs_adm:["Inventario","Control de asistencia","Entrega de turno","Gestión de adquisición de equipos e insumos"],
+   procs_cg:["Derrame de insumos líquidos en bodega de aseo","Falta de personal","Inundación","Falla sistema informático (SIC)","Incendio en bodegas del servicio de aseo"],
+   missing:[],has_hds:true,has_inger:true},
+
+  {num:"02",id:"VE",cat:1,short:"Control Sanitario de Vectores",version:"8",status:"En Actualización",
+   total_files:74,files_pdf:2,files_xls:31,files_doc:38,
+   counts:{proc_op:23,proc_adm:4,proc_cg:7,forms:29,flowcharts:1,job_desc:3,training:1,main_docs:2},total_procs:34,
+   procs_op:["Inspección áreas de ropería","Inspección de barreras protectoras","Inspección de plagas aparición estacional","Inspección áreas de preparación y almacenamiento alimentos","Control preventivo de insectos","Lavado de manos","Control preventivo de otros mamíferos","Control preventivo de arácnidos","Inspección áreas almacenamiento de residuos","Uso de letreros y señalización de advertencia","Sanitización de baños","Control preventivo de quirópteros","Inspección general del Establecimiento de Salud","Control preventivo de roedores","Control preventivo de palomas y otras aves","Control de plagas aparición estacional","Eliminación de animales muertos","Control de quirópteros","Control de palomas y otras aves","Desinsectación","Desratización","Control de otros mamíferos","Control de arácnidos"],
+   procs_adm:["Registro de entrada y salida","Entrega de turno","Control de inventario","Registro de insumos"],
+   procs_cg:["Aumento masivo de vectores","Quiebre stock de insumo","Derrame de sustancias peligrosas","Aparición de vector en unidades críticas","Intoxicación y contacto con sustancias químicas","Falla sistema informático de comunicación"],
+   missing:[],has_hds:true,has_inger:true},
+
+  {num:"04",id:"AL",cat:1,short:"Alimentación Pacientes y Funcionarios",version:"9",status:"Congelado",
+   total_files:45,files_pdf:3,files_xls:2,files_doc:34,
+   counts:{proc_op:8,proc_adm:4,proc_cg:3,forms:2,flowcharts:5,job_desc:16,training:1,main_docs:4},total_procs:15,
+   procs_op:["Almacenamiento de materias primas","Higiene y aseo del personal","Recepción de materias primas","Recepción y almacenamiento de productos químicos","Descongelación de productos o subproductos de animales de abasto","Limpieza y desinfección con alcohol 70°","Limpieza y desinfección del equipamiento","Limpieza y desinfección regular de utensilios"],
+   procs_adm:["Gestión de reclamos, sugerencias y felicitaciones","Solicitud a proveedores","Registro de entrada y salida del personal","Entrega de turno"],
+   procs_cg:["Incendio","Falla sistema informático (SIC)","Falta de suministro de energía eléctrica"],
+   missing:["Formularios"],has_hds:true,has_inger:true},
+
+  {num:"06",id:"RE",cat:1,short:"Gestión Integral de Residuos (REAS)",version:"1",status:"Congelado",
+   total_files:47,files_pdf:13,files_xls:13,files_doc:21,
+   counts:{proc_op:5,proc_adm:4,proc_cg:10,forms:9,flowcharts:1,job_desc:3,training:1,main_docs:1},total_procs:19,
+   procs_op:["Retiro y transporte de residuos fuera del Establecimiento de Salud","Retiro y transporte de residuos cortopunzantes","Almacenamiento de residuos en la central de residuos","Retiro y transporte de residuos a la central de residuos","Limpieza y desinfección de contenedores"],
+   procs_adm:["Control de asistencia","Entrega de turno","Gestión y adquisición de equipos e insumos","Inventario"],
+   procs_cg:["Sismo","Manejo de derrame de residuos peligrosos","Falta de insumos","Incendio","Eventos causados por presencia de agua","Falla en el SIC","Falla en el retiro de residuos del EDS","Falta de personal"],
+   missing:[],has_hds:true,has_inger:false},
+
+  {num:"13",id:"RO",cat:1,short:"Ropería",version:"1",status:"Congelado",
+   total_files:54,files_pdf:8,files_xls:17,files_doc:29,
+   counts:{proc_op:12,proc_adm:4,proc_cg:5,forms:14,flowcharts:1,job_desc:6,training:1,main_docs:1},total_procs:21,
+   procs_op:["Recolección de ropa sucia","Distribución y reposición de uniformes","Conteo de ropa sucia","Devolución de ropa no conforme","Recepción de ropa limpia desde lavandería","Baja de ropa","Distribución de ropa limpia","Entrega de ropa sucia a lavandería","Lavado de carros","Canje de toallas","Control de calidad","Distribución de ropa limpia (INGER)"],
+   procs_adm:["Entrega de turno","Control de asistencia","Gestión de inventario","Gestión de inventario (INGER)"],
+   procs_cg:["Falla en la dotación del personal","Falla en el SIC","Consumo del stock de seguridad"],
+   missing:[],has_hds:true,has_inger:false},
+
+  // ── CATEGORÍA 2: SERVICIOS BÁSICOS ──
+  {num:"07",id:"MOI",cat:2,short:"Mantenimiento y Operación de Infraestructura",version:"—",status:"En Desarrollo",
+   total_files:187,files_pdf:0,files_xls:0,files_doc:186,
+   counts:{proc_op:151,proc_adm:4,proc_cg:20,forms:0,flowcharts:0,job_desc:0,training:0,main_docs:0},total_procs:175,
+   procs_op:["6.1 Infraestructura General y Mobiliario Asociado","6.2 Sistema de Agua","6.3 Energía e Iluminación Artificial","6.4 Transporte Vertical (ascensores)","6.5 Corrientes Débiles","6.6 Sistema de Incendio","6.7 Correo Neumático","6.8 Climatización (HVAC)","6.9 Gases Clínicos","6.10 Control Centralizado BMS","6.11 Exteriores, Áreas Verdes y Paisajismo"],
+   procs_adm:["Gestión y control de inventario","Ingreso y salida de equipos MOI","Entrega de turno","Control de asistencia"],
+   procs_cg:["Falla del sistema de correo neumático","Extracción de cápsula atascada","Incendio","Sismo","Falla parcial en la red de distribución","Falla suministro energía grupo electrógeno"],
+   missing:["Documento PAPS principal","Formularios","Flujogramas","Descripciones de cargo","Plan de capacitación"],has_hds:false,has_inger:false},
+
+  {num:"08",id:"AMMNC",cat:2,short:"Adm. y Mant. Mobiliario No Clínico",version:"10",status:"En Actualización",
+   total_files:96,files_pdf:2,files_xls:40,files_doc:44,
+   counts:{proc_op:28,proc_adm:5,proc_cg:7,forms:36,flowcharts:6,job_desc:4,training:1,main_docs:2},total_procs:40,
+   procs_op:["Control físico de inventario","Mantenimiento cocina eléctrica","Mantenimiento telón","Mantenimiento sistema intercomunicador","Mantenimiento espejos","Mantenimiento armarios","Mantenimiento cámara refrigerada","Mantenimiento anaquel y librero","Mantenimiento kardex","Mantenimiento gabinetes","Mantenimiento sistema de amplificación","Mantenimiento ducha de ojos","Mantenimiento estaciones de trabajo","Mantenimiento caja fuerte","Mantenimiento mesas","Mantenimiento lockers","Mantenimiento percheros","Mantenimiento cama","Mantenimiento butacas","Mantenimiento televisores","Mantenimiento pizarras","Mantenimiento caja registradora","Mantenimiento sillones","Mantenimiento sillas","Mantenimiento MNC en unidades muy críticas"],
+   procs_adm:["Gestionar garantías del MNC","Gestión del inventario","Adquisición de materiales y accesorios","Registro de entrada y salida del personal","Entrega de turno"],
+   procs_cg:["Falla sistema informático de comunicación","Daño al MNC por actos vandálicos","Daño al MNC por inundación","Daño al MNC por sismo","Daño al MNC por incendio"],
+   missing:[],has_hds:true,has_inger:true},
+
+  {num:"11",id:"AMNC",cat:2,short:"Adq. y Rep. Mobiliario No Clínico",version:"10",status:"En Actualización",
+   total_files:34,files_pdf:3,files_xls:11,files_doc:13,
+   counts:{proc_op:0,proc_adm:6,proc_cg:3,forms:6,flowcharts:5,job_desc:4,training:1,main_docs:2},total_procs:9,
+   procs_op:[],
+   procs_adm:["Registro de entrada y salida del personal","Entrega de llaves","Gestión de compra","Instalación y etiquetado","Recepción mobiliario","Entrega del MNC"],
+   procs_cg:["Incumplimiento en fecha de recepción del MNC"],
+   missing:["Procedimientos operativos"],has_hds:true,has_inger:true},
+
+  // ── CATEGORÍA 3: ESPECIALES OBLIGATORIOS ──
+  {num:"03",id:"ES",cat:3,short:"Estacionamiento Funcionarios y Visitas",version:"10",status:"En Actualización",
+   total_files:98,files_pdf:14,files_xls:34,files_doc:39,
+   counts:{proc_op:13,proc_adm:9,proc_cg:12,forms:29,flowcharts:8,job_desc:4,training:1,main_docs:2},total_procs:34,
+   procs_op:["Bloqueo por falla de lockers","Falla sistema de pago","Reparación de daños en estacionamiento","Falla en dispensador de ticket o lector de tarjeta","Inspección general","Rondas de Inspección","Mantenimiento de barreras y sistemas asociados","Gestión del tráfico"],
+   procs_adm:["Registro de actividades","Uso indebido de estacionamiento","Abandono de sillas de rueda u otros elementos","Fijar tarifas de estacionamiento a público general","Entrega de turno","Revisión de lockers","Entrega de acceso a funcionarios","Pérdida de ticket","Registro de entrada y salida de personal"],
+   procs_cg:["Falla sistema informático (SIC)","Problemas de acceso y salida","Accidente vehicular en estacionamiento","Evacuación por falla sistema extracción de gases","Inundación en el estacionamiento","Incendio en el estacionamiento","Atropello a peatón","Robo de vehículo","Robo o hurto en estacionamiento","Bulto abandonado"],
+   missing:[],has_hds:true,has_inger:true},
+
+  {num:"05",id:"TI",cat:3,short:"Sistemas de Información e Infraestructura TI",version:"—",status:"En Actualización",
+   total_files:100,files_pdf:3,files_xls:42,files_doc:47,
+   counts:{proc_op:0,proc_adm:14,proc_cg:14,forms:33,flowcharts:6,job_desc:3,training:1,main_docs:2},total_procs:28,
+   procs_op:[],
+   procs_adm:["Gestión plataforma SIC","Mantenimiento preventivo hardware servidores","Mantenimiento preventivo HW estaciones de trabajo","Mantenimiento preventivo comunicaciones","Mantenimiento RIS-PACS","Mantenimiento impresoras de etiquetas","Gestión de monitoreo de seguridad","Gestión de cambio","Gestión de operaciones TI","Gestión de capacidad y desempeño","Configuración y monitoreo Firewall","Gestión de planes de recuperación de desastres","Update de software","Planificar cambio de versiones de software"],
+   procs_cg:["Falla total o parcial del SIC","Falla de hardware crítico","Falla de comunicaciones","Ransomware o ataque cibernético","Falla energía en sala servidores","Desastre natural afectando centros de datos"],
+   missing:["Procedimientos operativos SIC"],has_hds:true,has_inger:true},
+
+  {num:"09",id:"AMEQM",cat:3,short:"Adm. y Mant. Equipo Médico y Mob. Clínico",version:"7",status:"En Actualización",
+   total_files:75,files_pdf:3,files_xls:30,files_doc:31,
+   counts:{proc_op:10,proc_adm:10,proc_cg:7,forms:23,flowcharts:7,job_desc:5,training:1,main_docs:2},total_procs:27,
+   procs_op:["Calibración de equipos","Actualización software","Entrega EQMMC de reemplazo","Diagnóstico de fallas","Ingreso y salida del EQMMC del ES","Mantenimiento remoto","Mantenimiento correctivo general","Desinstalación de EQMMC"],
+   procs_adm:["Gestión de seguros del EQMMC","Convenio equipamiento médico sujeto de suplencia asistencial","Registro de entrada y salida del personal","Entrega de turno","Gestión del inventario","Control físico de inventario","Reportes normativos","Adquisición de materiales, repuestos y accesorios","Gestión de garantías del EQMMC"],
+   procs_cg:["Daño al EQMMC por incendio","Daño al EQMMC por sismo","Falla sistema informático (SIC)","Daño al EQMMC por inundación","Falla equipos críticos y muy críticos"],
+   missing:[],has_hds:true,has_inger:true},
+
+  {num:"10",id:"AEQM",cat:3,short:"Adq. y Rep. Equipo Médico y Mob. Clínico",version:"7",status:"En Actualización",
+   total_files:38,files_pdf:3,files_xls:12,files_doc:15,
+   counts:{proc_op:0,proc_adm:6,proc_cg:5,forms:8,flowcharts:5,job_desc:4,training:1,main_docs:2},total_procs:11,
+   procs_op:[],
+   procs_adm:["Instalación y etiquetado","Gestión de compra por cotización","Registro de entrada y salida del personal","Entrega del EQMMC","Gestión de compra por licitación pública","Recepción EQMMC"],
+   procs_cg:["Incumplimiento en fecha de entrega del proveedor","Falla en la instalación del EQMMC","Falla del proveedor en recepción provisoria"],
+   missing:["Procedimientos operativos"],has_hds:true,has_inger:true},
+
+  {num:"12",id:"VI",cat:3,short:"Seguridad y Vigilancia",version:"Final",status:"Congelado",
+   total_files:59,files_pdf:2,files_xls:12,files_doc:34,
+   counts:{proc_op:20,proc_adm:3,proc_cg:7,forms:9,flowcharts:6,job_desc:3,training:1,main_docs:0},total_procs:30,
+   procs_op:["Control de acceso a Central de Monitoreo","Administración de imágenes CCTV","Control de accesos peatonales","Control de accesos de visitas a pacientes hospitalizados","Control de accesos en recintos restringidos","Operación sistemas de seguridad (chapas magnéticas, RFID)","Operación sistema de control de asistencia SC","Control de acceso vehicular","Requerimientos de seguridad extraordinarios","Apoyo en orientación general de usuarios","Gestión y custodia de llaves","Custodia de bienes de pacientes y visitas (lockers)","Resguardo de instalaciones y bienes afectos a la concesión"],
+   procs_adm:["Registro de entrada y salida del personal","Entrega de turno","Gestión de reportes"],
+   procs_cg:["Incendio en el establecimiento","Sismo","Falla sistema informático (SIC)","Ataque o amenaza de seguridad","Falla energía eléctrica general","Evacuación de emergencia"],
+   missing:["Documento PAPS principal"],has_hds:false,has_inger:false},
+
+  {num:"14",id:"CA",cat:3,short:"Cafetería",version:"7",status:"Congelado",
+   total_files:109,files_pdf:2,files_xls:41,files_doc:61,
+   counts:{proc_op:9,proc_adm:10,proc_cg:22,forms:35,flowcharts:2,job_desc:8,training:1,main_docs:4},total_procs:41,
+   procs_op:["Venta de alimentos","Control de inventario","Almacenamiento","Higiene y Aseo del personal","Mantenimiento preventivo de equipos","Recepción de alimentos","Limpieza de superficies, equipos y utensilios"],
+   procs_adm:["Solicitud de productos alimenticios a Central de Alimentación","Solicitud de productos alimenticios a proveedores","Apertura y cierre de caja","Registro de entrada y salida del personal","Solicitud de insumos y utensilios"],
+   procs_cg:["Falla sistema informático de comunicación","Identificación de vectores","Asalto o robo al interior del recinto","Falta de suministro de energía eléctrica","Falta de suministro de agua","Sismo igual o superior a VI","Falla sistema registro computacional","Incendio"],
+   missing:[],has_hds:true,has_inger:true},
+];
+
+
+/* ── secciones canónicas ───────────────────────────────────────── */
+var SEC_LABEL = {
+  descripcion:'Descripción', normativa:'Normativa', definiciones:'Definiciones',
+  actividades:'Actividades', programacion:'Programación', flujograma:'Flujogramas',
+  coordinacion:'Coordinación', procedimientos:'Procedimientos', contingencia:'Contingencias',
+  rrhh:'Recursos Humanos', equipamiento:'Equipos e insumos', sic:'SIC / Sistemas',
+  calidad:'Control de calidad', planos:'Planos y flujos', anexos:'Anexos',
+  portada:'Portada', general:'General'
+};
+var KIND_LABEL = {h:'Título', p:'Párrafo', li:'Viñeta', tbl:'Tabla', img:'Figura'};
+
+/* ── conjuntos comparables ─────────────────────────────────────── */
+var CMP_LABEL = {
+  contingencias:'Contingencias', procedimientos:'Procedimientos', actividades:'Actividades',
+  equipos:'Equipos', stock:'Stock de insumos', indicadores:'Indicadores', cargos:'Cargos',
+  educacion:'Requisitos de educación', supervision:'Supervisión', turnos:'Jornadas y turnos',
+  malla_turnos:'Malla de turnos', epp:'EPP', uniforme:'Uniforme', salud:'Salud ocupacional',
+  definiciones:'Definiciones', dotacion:'Dotación', frecuencias:'Frecuencias',
+  simbologia:'Simbología', aprobacion:'Aprobación'
+};
+var CMP_ORDER = ['contingencias','procedimientos','actividades','equipos','stock','indicadores',
+  'cargos','supervision','turnos','malla_turnos','educacion','epp','uniforme','salud',
+  'definiciones','dotacion','frecuencias'];
+
+/* ── plataformas del HUB relacionadas con cada PAPS ────────────── */
+var PLAT = {
+  AS:    [['27.CoberturaRecinto.html','Cobertura por Recinto'],['6.AtlasHDS.html','Atlas HDS'],['16.AutorizacionSanitaria.html','Autorización Sanitaria']],
+  VE:    [['16.AutorizacionSanitaria.html','Autorización Sanitaria'],['6.AtlasHDS.html','Atlas HDS']],
+  ES:    [['8.Navegacion.html','Navegación'],['6.AtlasHDS.html','Atlas HDS'],['26.ManualBuenasPracticas.html','Buenas Prácticas']],
+  AL:    [['16.AutorizacionSanitaria.html','Autorización Sanitaria'],['26.ManualBuenasPracticas.html','Buenas Prácticas'],['12.Logistica.html','Logística']],
+  TI:    [['27.CoberturaRecinto.html','Cobertura (Telefonía IP)'],['5.Credenciales.html','Credenciales']],
+  RE:    [['27.CoberturaRecinto.html','Cobertura por Recinto'],['6.AtlasHDS.html','Atlas HDS'],['16.AutorizacionSanitaria.html','Autorización Sanitaria']],
+  MOI:   [['8.Navegacion.html','Navegación'],['25.CorreoNeumatico.html','Correo Neumático'],['6.AtlasHDS.html','Atlas HDS']],
+  AMMNC: [['28.LockerBox.html','LockerBox'],['27.CoberturaRecinto.html','Cobertura (MNC)'],['14.PlanillaTC.html','Planilla T/C']],
+  AMNC:  [['28.LockerBox.html','LockerBox'],['27.CoberturaRecinto.html','Cobertura (MNC)']],
+  AMEQM: [['2.EquiBox.html','EquiBox'],['14.PlanillaTC.html','Planilla T/C'],['22.ReporteriaDespliegueEMMC.html','Despliegue EMMC'],['30.CoordinacionCapacitaciones.html','Capacitaciones']],
+  AEQM:  [['2.EquiBox.html','EquiBox'],['22.ReporteriaDespliegueEMMC.html','Despliegue EMMC'],['1.QuirurBox.html','QuirurBox']],
+  VI:    [['5.Credenciales.html','Credenciales'],['28.LockerBox.html','LockerBox'],['8.Navegacion.html','Navegación']],
+  RO:    [['27.CoberturaRecinto.html','Cobertura por Recinto'],['16.AutorizacionSanitaria.html','Autorización Sanitaria']],
+  CA:    [['26.ManualBuenasPracticas.html','Buenas Prácticas'],['16.AutorizacionSanitaria.html','Autorización Sanitaria']]
+};
+
+/* ═══ UTILIDADES ═══════════════════════════════════════════════ */
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g, function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function deacc(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+function byId(id){ return document.getElementById(id); }
+function svcOf(id){ for(var i=0;i<SERVICES.length;i++) if(SERVICES[i].id===id) return SERVICES[i]; return null; }
+function color(id){ var s=svcOf(id); return s?CAT_COLOR[s.cat]:'#64748b'; }
+
+/* stopwords + normalización ligera del español */
+var STOP = {};
+('de la el los las un una unos unas y o u en a al del que se por con para su sus lo le les es son ser sera fue como mas mai pero si no ni ya sobre entre desde hasta cuando donde cual cuales este esta estos estas ese esa esos esas aquel todo toda todos todas otro otra otros otras cada dos tres debe deben debera deberan podra podran tiene tienen tener haber hay ha han sido segun tanto tambien ademas cualquier mismo misma respectivo respectiva correspondiente correspondientes').split(' ').forEach(function(w){ STOP[w]=1; });
+
+function stem(t){
+  if(t.length<5) return t;
+  if(/(ciones|siones)$/.test(t)) return t.slice(0,-5)+'on';
+  if(/cion$/.test(t)) return t;
+  if(/(mente)$/.test(t)) return t.slice(0,-5);
+  if(/(es)$/.test(t) && t.length>5 && !/[aeiou]es$/.test(t)) return t.slice(0,-2);
+  if(/s$/.test(t) && !/(is|us|as|es|os)$/.test(t)) return t.slice(0,-1);
+  if(/(os|as)$/.test(t)) return t.slice(0,-1);
+  return t;
+}
+var CODE_RE = /CSSO[-–][A-Za-z]{2,6}[-–]P[-–][A-Za-z]{2}[-–]\d{2,3}/g;
+function codeTok(c){ return 'cod'+deacc(c).replace(/[^a-z0-9]/g,''); }
+
+function tokenize(s){
+  var out=[];
+  // los códigos CSSO-XX-P-YY-NNN entran como un único término exacto
+  var codes = String(s||'').match(CODE_RE);
+  if(codes) for(var c=0;c<codes.length;c++) out.push(codeTok(codes[c]));
+  var raw = deacc(s).replace(/[^a-z0-9ñ]+/g,' ').split(' ');
+  for(var i=0;i<raw.length;i++){
+    var t=raw[i];
+    if(t.length<2 || STOP[t]) continue;
+    out.push(stem(t));
+  }
+  return out;
+}
+
+/* ── sinónimos desde el glosario de acrónimos del HUB ─────────────── */
+var ACRO = window.SHARED_ACRONIMOS || [];
+var SYN = Object.create(null);      // término → [equivalentes]
+var ACRO_MAP = Object.create(null); // sigla en mayúsculas → entrada
+(function buildSyn(){
+  function add(a,b){
+    if(!a||!b||a===b) return;
+    (SYN[a] || (SYN[a]=[])).push(b);
+  }
+  ACRO.forEach(function(e){
+    var sig = (e.acronimo||'').trim();
+    if(!sig) return;
+    ACRO_MAP[sig.toUpperCase()] = e;
+    var st = tokenize(sig), nt = tokenize(e.nombre||'');
+    if(st.length!==1 || !nt.length) return;
+    nt.forEach(function(t){ add(st[0], t); add(t, st[0]); });
+  });
+  // equivalencias propias del contrato que el glosario no cubre
+  [['eqmmc','equipamiento'],['eqmmc','medico'],['mnc','mobiliario'],['mnc','clinico'],
+   ['eds','establecimiento'],['sic','informatico'],['epp','proteccion'],
+   ['reas','residuo'],['if','inspector'],['sc','concesionaria'],['paps','programa']
+  ].forEach(function(p){ add(p[0],p[1]); add(p[1],p[0]); });
+  for(var k in SYN){
+    SYN[k] = SYN[k].filter(function(v,i,a){ return a.indexOf(v)===i && !STOP[v]; }).slice(0,6);
+  }
+})();
+
+/* ═══ CORPUS → PASAJES ═════════════════════════════════════════ */
+var P = [];        // pasajes
+var IDX = null;    // índice invertido
+var AVGLEN = 0;
+
+function buildPassages(){
+  if(!PAPS) return;
+  PAPS.servicios.forEach(function(s){
+    var blocks = PAPS.docs[s.id] || [];
+    blocks.forEach(function(b){
+      var base = {svc:s.id, num:s.num, b:b.i, sec:b.sec, path:b.p||[]};
+      if(b.k==='h'){
+        P.push(Object.assign({k:'h', lvl:b.lvl, txt:b.t}, base));
+      } else if(b.k==='p' || b.k==='li'){
+        if(b.t && b.t.length>1) P.push(Object.assign({k:b.k, txt:b.t}, base));
+      } else if(b.k==='img'){
+        var cap = (b.t||'') + ' ' + (b.p||[]).slice(-2).join(' ');
+        P.push(Object.assign({k:'img', txt:cap.trim()||'Figura', src:b.src}, base));
+      } else if(b.k==='tbl'){
+        var rows=b.rows||[], hdr=rows[0]||[];
+        P.push(Object.assign({k:'tbl', tk:b.tk, txt:hdr.join(' · '), head:1}, base));
+        for(var r=1;r<rows.length;r++){
+          var cells=rows[r];
+          if(!cells.join('').trim()) continue;
+          P.push(Object.assign({k:'tbl', tk:b.tk, row:r, txt:cells.join(' · '), hdr:hdr}, base));
+        }
+      }
+    });
+  });
+}
+
+function buildIndex(){
+  IDX = Object.create(null);
+  var total=0;
+  for(var i=0;i<P.length;i++){
+    var toks = tokenize(P[i].txt);
+    // el título de sección aporta contexto al pasaje
+    if(P[i].path && P[i].path.length) toks = toks.concat(tokenize(P[i].path[P[i].path.length-1]));
+    P[i].len = toks.length; total += toks.length;
+    var tf = Object.create(null);
+    for(var j=0;j<toks.length;j++) tf[toks[j]] = (tf[toks[j]]||0)+1;
+    for(var t in tf){
+      (IDX[t] || (IDX[t]=[])).push(i, tf[t]);
+    }
+  }
+  AVGLEN = total/Math.max(1,P.length);
+}
+
+/* BM25 + boost por tipo de bloque y coincidencia de frase */
+var K1=1.35, Bp=0.72;
+var KBOOST = {h:2.3, tbl:1.15, p:1, li:1, img:1.1};
+
+function search(query, filt){
+  var qt = tokenize(query);
+  if(!qt.length) return [];
+  qt = qt.filter(function(t,i){ return qt.indexOf(t)===i; });
+  var last = deacc(query).replace(/[^a-z0-9ñ ]/g,' ').trim().split(' ').pop();
+  var N = P.length, scores = Object.create(null), cover = Object.create(null);
+
+  qt.forEach(function(t, qi){
+    var post = IDX[t];
+    var expanded = [];
+    if(post) expanded.push([t, post, 1]);
+    // sinónimos y siglas del glosario del HUB (solo en consultas cortas, peso bajo)
+    if(qt.length<=3) (SYN[t]||[]).forEach(function(s){ if(IDX[s]) expanded.push([s, IDX[s], .3]); });
+    // prefijo para el último término (búsqueda mientras se escribe)
+    if(qi===qt.length-1 && last && last.length>=3 && !post){
+      for(var k in IDX){ if(k.indexOf(t)===0){ expanded.push([k, IDX[k], .75]); if(expanded.length>28) break; } }
+    }
+    expanded.forEach(function(e){
+      var pl=e[1], w=e[2], df=pl.length/2;
+      var idf = Math.log(1 + (N-df+0.5)/(df+0.5));
+      for(var i=0;i<pl.length;i+=2){
+        var pid=pl[i], tf=pl[i+1], p=P[pid];
+        var s = idf * (tf*(K1+1)) / (tf + K1*(1-Bp+Bp*p.len/AVGLEN));
+        scores[pid] = (scores[pid]||0) + s*w*(KBOOST[p.k]||1);
+        var cv = cover[pid] || (cover[pid] = {});
+        cv[qi] = 1;
+      }
+    });
+  });
+
+  // precisión: con varios términos, exige que el pasaje cubra la mayoría de ellos
+  var need = qt.length>=2 ? Math.max(2, Math.ceil(qt.length*0.7)) : 1;
+  var phrase = deacc(query.trim());
+  var out=[], relaxed=[];
+  for(var pid in scores){
+    var p = P[pid];
+    var nCov = Object.keys(cover[pid]||{}).length;
+    if(filt){
+      if(filt.svc && filt.svc.length && filt.svc.indexOf(p.svc)<0) continue;
+      if(filt.sec && filt.sec!=='all' && p.sec!==filt.sec) continue;
+      if(filt.kind && filt.kind!=='all' && p.k!==filt.kind && !(filt.kind==='li'&&p.k==='p')) continue;
+    }
+    var sc = scores[pid] * (1 + 0.35*(nCov-1));
+    if(phrase.length>4 && deacc(p.txt).indexOf(phrase)>=0) sc *= 2.1;
+    var rec = {p:p, id:+pid, sc:sc};
+    if(nCov >= need) out.push(rec); else relaxed.push(rec);
+  }
+  if(!out.length) out = relaxed;
+  out.sort(function(a,b){ return b.sc-a.sc; });
+  return out;
+}
+
+/* facetas sin aplicar el propio filtro de esa faceta */
+function facets(query, filt){
+  var res = search(query, {svc:filt.svc, sec:'all', kind:'all'});
+  var sec={}, kind={};
+  res.forEach(function(r){ sec[r.p.sec]=(sec[r.p.sec]||0)+1; kind[r.p.k]=(kind[r.p.k]||0)+1; });
+  var res2 = search(query, {svc:null, sec:filt.sec, kind:filt.kind});
+  var svc={};
+  res2.forEach(function(r){ svc[r.p.svc]=(svc[r.p.svc]||0)+1; });
+  return {sec:sec, kind:kind, svc:svc};
+}
+
+/* ── fragmento con resaltado ────────────────────────────────── */
+function terms(query){
+  return deacc(query).replace(/[^a-z0-9ñ ]/g,' ').split(' ')
+    .filter(function(t){ return t.length>=2 && !STOP[t]; })
+    .map(function(t){ return stem(t); });
+}
+function snippet(text, query, max){
+  max = max || 260;
+  var tl = terms(query), d = deacc(text), pos=-1;
+  for(var i=0;i<tl.length && pos<0;i++){ var k=d.indexOf(tl[i]); if(k>=0) pos=k; }
+  var start = 0;
+  if(pos > max*0.4){ start = Math.max(0, pos - Math.floor(max*0.35)); }
+  var cut = text.slice(start, start+max);
+  if(start>0) cut = '…'+cut;
+  if(start+max < text.length) cut = cut+'…';
+  return highlight(cut, query);
+}
+function highlight(text, query){
+  var tl = terms(query);
+  if(!tl.length) return esc(text);
+  var d = deacc(text), marks = new Array(text.length).fill(0);
+  tl.forEach(function(t){
+    var from=0, k;
+    while((k = d.indexOf(t, from)) >= 0){
+      // extiende hasta el final de la palabra
+      var end=k+t.length;
+      while(end<d.length && /[a-z0-9ñ]/.test(d[end])) end++;
+      for(var i=k;i<end;i++) marks[i]=1;
+      from = k + Math.max(1,t.length);
+    }
+  });
+  var out='', open=false;
+  for(var i=0;i<text.length;i++){
+    if(marks[i] && !open){ out+='<mark>'; open=true; }
+    if(!marks[i] && open){ out+='</mark>'; open=false; }
+    out += esc(text[i]);
+  }
+  if(open) out+='</mark>';
+  return out;
+}
+
+/* ═══ ESTADO ═══════════════════════════════════════════════════ */
+var ST = {
+  view:'servicios', q:'', cat:'all', status:'all',
+  svc:[], sec:'all', kind:'all',
+  limit:40, cmp:'contingencias', docId:null, docHl:''
+};
+
+/* ═══ VISTA: SERVICIOS ═════════════════════════════════════════ */
+function statusBadge(s){
+  if(s==='Congelado') return '<span class="badge b-frozen">✔ Congelado</span>';
+  if(s==='En Actualización') return '<span class="badge b-update">↺ En Actualización</span>';
+  return '<span class="badge b-dev">⚙ En Desarrollo</span>';
+}
+function renderServicios(){
+  var host = byId('svcCats'), html='';
+  [1,2,3].forEach(function(cat){
+    var list = SERVICES.filter(function(s){ return s.cat===cat; });
+    if(ST.cat!=='all' && String(cat)!==ST.cat) return;
+    var shown = list.filter(function(s){ return ST.status==='all' || s.status===ST.status; });
+    if(!shown.length) return;
+    html += '<div class="catsec" style="--cc:'+CAT_COLOR[cat]+'">'
+      + '<div class="cathdr"><span style="font-size:18px">'+CAT_ICON[cat]+'</span><div>'
+      + '<div class="cathdr-t">'+CAT_NAME[cat]+'</div>'
+      + '<div class="cathdr-s">'+shown.length+' servicio'+(shown.length>1?'s':'')+' concesionado'+(shown.length>1?'s':'')+'</div>'
+      + '</div><div class="cathdr-p">'+shown.reduce(function(a,s){return a+s.total_procs;},0)+' procedimientos</div></div>'
+      + '<div class="grid">'
+      + shown.map(cardHTML).join('')
+      + '</div></div>';
+  });
+  host.innerHTML = html || '<div class="empty"><h3>Sin servicios para este filtro</h3></div>';
+  Array.prototype.forEach.call(host.querySelectorAll('.scard'), function(el){
+    el.onclick = function(){
+      var id = el.getAttribute('data-id');
+      if(PAPS && PAPS.docs[id]) openDoc(id);
+      else alert('El documento PAPS de este servicio aún no está disponible en la carpeta de origen.');
+    };
+  });
+}
+function cardHTML(s){
+  var doc = PAPS && PAPS.docs[s.id];
+  var meta = doc ? PAPS.servicios.filter(function(x){return x.id===s.id;})[0] : null;
+  return '<div class="scard'+(doc?'':' nodoc')+'" data-id="'+s.id+'" style="--cc:'+CAT_COLOR[s.cat]+'">'
+    + '<div class="sc-top"><div class="sc-num">'+s.num+'</div><div><div class="sc-id">'+s.id+'</div>'
+    + '<div class="sc-name">'+esc(s.short)+'</div></div></div>'
+    + '<div class="sc-badges">'+statusBadge(s.status)
+    + '<span class="badge b-version">v'+s.version+'</span>'
+    + (doc ? '<span class="badge b-doc">📄 Documento cargado</span>' : '<span class="badge b-missing">Sin documento</span>')
+    + (s.missing.length ? '<span class="badge b-missing">Falta: '+esc(s.missing.join(', '))+'</span>' : '')
+    + '</div>'
+    + '<div class="sc-stats"><span><b>'+s.total_procs+'</b> proc.</span><span>·</span>'
+    + '<span><b>'+s.counts.proc_cg+'</b> conting.</span><span>·</span>'
+    + '<span><b>'+s.total_files+'</b> archivos</span></div>'
+    + (meta ? '<div class="sc-foot"><span>'+meta.toc.length+' secciones</span><span>·</span>'
+        + '<span>'+meta.nTbl+' tablas</span><span>·</span><span>'+meta.nImg+' figuras</span>'
+        + '<span class="sc-open">Abrir →</span></div>'
+      : '<div class="sc-foot"><span>Documento principal no disponible</span></div>')
+    + '</div>';
+}
+
+/* ═══ VISTA: BÚSQUEDA ══════════════════════════════════════════ */
+var lastResults = [];
+function renderBuscar(){
+  var q = ST.q.trim();
+  if(!q){
+    byId('rTitle').textContent = 'Búsqueda en los 13 PAPS';
+    byId('rSub').textContent = '';
+    byId('rList').innerHTML = '<div class="empty"><h3>Escribe para buscar</h3>'
+      + '<p>La consulta recorre '+P.length.toLocaleString('es-CL')+' pasajes: párrafos, filas de tabla, títulos y figuras.</p>'
+      + '<p style="margin-top:14px">'+['incendio','sismo','ransomware','stock crítico','vida útil','entrega de turno','vacunación','indicador','derrame','capacitación'].map(function(x){
+          return '<button class="fbtn" style="margin:3px" onclick="setQuery(\''+x+'\')">'+x+'</button>'; }).join('')+'</p></div>';
+    byId('rMore').style.display='none';
+    return;
+  }
+  var res = search(q, {svc:ST.svc, sec:ST.sec, kind:ST.kind});
+  lastResults = res;
+  byId('rTitle').innerHTML = '“'+esc(q)+'”' + acroHint(q);
+  byId('rSub').textContent = res.length
+    ? res.length.toLocaleString('es-CL')+' coincidencias en '
+      + Object.keys(res.reduce(function(a,r){a[r.p.svc]=1;return a;},{})).length + ' servicios'
+    : 'sin coincidencias';
+  if(!res.length){
+    byId('rList').innerHTML = '<div class="empty"><h3>Sin resultados</h3><p>Prueba con menos palabras o revisa los filtros activos.</p></div>';
+    byId('rMore').style.display='none';
+    return;
+  }
+  var slice = res.slice(0, ST.limit);
+  byId('rList').innerHTML = slice.map(function(r){ return resultHTML(r, q); }).join('');
+  byId('rMore').style.display = res.length>ST.limit ? 'block' : 'none';
+  byId('rMore').textContent = 'Ver más ('+(res.length-ST.limit).toLocaleString('es-CL')+' restantes)';
+  bindResults();
+}
+/* aviso cuando la consulta es una sigla y se amplió a su forma larga */
+function acroHint(q){
+  var w = q.trim().toUpperCase().split(/\s+/);
+  if(w.length>2) return '';
+  var e = ACRO_MAP[w[0]] || (w[1] && ACRO_MAP[w[1]]);
+  if(!e) return '';
+  return '<span style="font-size:11.5px;font-weight:600;color:#0369a1;background:#f0f9ff;'
+    + 'border:1px solid #bae6fd;border-radius:7px;padding:3px 9px;margin-left:10px;white-space:nowrap">'
+    + esc(e.acronimo)+' = '+esc(e.nombre)+' · se incluyó también la forma larga</span>';
+}
+
+function resultHTML(r, q){
+  var p = r.p, s = svcOf(p.svc);
+  var crumb = (p.path||[]).slice(1).join(' › ') || SEC_LABEL[p.sec] || '';
+  var kind = p.k==='tbl' ? (p.head?'Tabla':'Fila de tabla') : KIND_LABEL[p.k];
+  var txt;
+  if(p.k==='tbl' && p.hdr && p.row){
+    var cells = p.txt.split(' · ');
+    txt = cells.map(function(c,i){
+      var h = p.hdr[i] ? '<b style="color:#94a3b8;font-weight:700">'+esc(p.hdr[i])+':</b> ' : '';
+      return c.trim() ? h + highlight(c, q) : '';
+    }).filter(Boolean).join(' &nbsp;·&nbsp; ');
+  } else {
+    txt = snippet(p.txt, q, p.k==='h'?160:280);
+  }
+  return '<div class="rcard" data-svc="'+p.svc+'" data-b="'+p.b+'" style="--cc:'+color(p.svc)+'">'
+    + '<div class="r-top"><span class="r-svc">'+p.num+' · '+p.svc+'</span>'
+    + '<span class="r-kind k-'+p.k+'">'+kind+'</span>'
+    + '<span class="r-crumb">'+esc(crumb)+'</span>'
+    + '<span class="r-score">'+SEC_LABEL[p.sec]+'</span></div>'
+    + '<div class="r-txt">'+txt+'</div></div>';
+}
+function bindResults(){
+  Array.prototype.forEach.call(document.querySelectorAll('#rList .rcard'), function(el){
+    el.onclick = function(){ openDoc(el.getAttribute('data-svc'), +el.getAttribute('data-b'), ST.q); };
+  });
+}
+
+/* ═══ VISTA: COMPARADOR ════════════════════════════════════════ */
+function renderComparar(){
+  if(!PAPS) return;
+  var cross = PAPS.cross || {};
+  byId('cmpBar').innerHTML = CMP_ORDER.filter(function(k){ return cross[k] && cross[k].length; })
+    .map(function(k){
+      return '<button class="cmp-t'+(ST.cmp===k?' on':'')+'" data-k="'+k+'">'+CMP_LABEL[k]
+        + '<span class="n">'+cross[k].length+'</span></button>';
+    }).join('');
+  Array.prototype.forEach.call(byId('cmpBar').querySelectorAll('.cmp-t'), function(el){
+    el.onclick = function(){ ST.cmp = el.getAttribute('data-k'); renderComparar(); };
+  });
+
+  var rows = (cross[ST.cmp]||[]).slice();
+  if(ST.svc.length) rows = rows.filter(function(r){ return ST.svc.indexOf(r.svc)>=0; });
+  var q = ST.q.trim();
+  if(q){
+    var tl = terms(q);
+    rows = rows.filter(function(r){
+      var d = deacc(r.r.join(' '));
+      return tl.every(function(t){ return d.indexOf(t)>=0; });
+    });
+  }
+  byId('cmpSub').textContent = rows.length.toLocaleString('es-CL')+' filas · '
+    + CMP_LABEL[ST.cmp] + ' de los 13 PAPS' + (q?' · filtrado por “'+q+'”':'');
+
+  // columnas: encabezado más frecuente del conjunto
+  var hdrCount = {};
+  rows.forEach(function(r){ var k=r.h.join('|'); hdrCount[k]=(hdrCount[k]||0)+1; });
+  var best = Object.keys(hdrCount).sort(function(a,b){return hdrCount[b]-hdrCount[a];})[0];
+  var cols = (best ? best.split('|') : []).slice(0,7);
+  if(cols.length<2) cols = ['Contenido','',''].slice(0, Math.max(2, cols.length));
+  var colKey = cols.map(function(c){ return deacc(c).replace(/[^a-z0-9]/g,''); });
+
+  // cada fila se alinea por NOMBRE de columna; lo que no calza se agrega al final
+  function align(r){
+    var cells = new Array(cols.length).fill('');
+    var extra = [];
+    r.r.forEach(function(v, i){
+      if(!v || !v.trim()) return;
+      var k = deacc(r.h[i]||'').replace(/[^a-z0-9]/g,'');
+      var at = k ? colKey.indexOf(k) : -1;
+      if(at<0 && k) for(var j=0;j<colKey.length;j++){
+        if(colKey[j] && (colKey[j].indexOf(k)===0 || k.indexOf(colKey[j])===0)){ at=j; break; }
+      }
+      if(at>=0 && !cells[at]) cells[at]=v;
+      else extra.push((r.h[i]?r.h[i]+': ':'')+v);
+    });
+    if(extra.length){
+      var slot = cells.lastIndexOf('');
+      var txt = extra.join(' · ');
+      if(slot>=0) cells[slot]=txt; else cells[cells.length-1] += (cells[cells.length-1]?' · ':'')+txt;
+    }
+    return cells;
+  }
+
+  var html = '<thead><tr><th style="width:74px">Servicio</th>'
+    + cols.map(function(c,i){ return '<th>'+esc(c||('Columna '+(i+1)))+'</th>'; }).join('')
+    + '<th style="width:56px"></th></tr></thead><tbody>';
+  rows.slice(0, 900).forEach(function(r){
+    var cells = align(r);
+    html += '<tr><td><span class="cmp-svc" style="background:'+color(r.svc)+'">'+r.num+' '+r.svc+'</span></td>'
+      + cells.map(function(v){ return '<td>'+(q?highlight(v,q):esc(v))+'</td>'; }).join('')
+      + '<td><span class="cmp-go" data-svc="'+r.svc+'" data-b="'+r.b+'">ver →</span></td></tr>';
+  });
+  html += '</tbody>';
+  if(rows.length>900) byId('cmpSub').textContent += ' · se muestran las primeras 900';
+  byId('cmpTbl').innerHTML = html;
+  Array.prototype.forEach.call(byId('cmpTbl').querySelectorAll('.cmp-go'), function(el){
+    el.onclick = function(){ openDoc(el.getAttribute('data-svc'), +el.getAttribute('data-b'), ST.q); };
+  });
+}
+
+/* ═══ VISTA: TEMA TRANSVERSAL ══════════════════════════════════ */
+function renderTema(){
+  var q = ST.q.trim();
+  byId('tTitle').textContent = q ? 'Tema transversal: “'+q+'”' : 'Tema transversal';
+  if(!q){
+    byId('tSub').textContent='';
+    byId('themeGrid').innerHTML = '<div class="empty" style="grid-column:1/-1">'
+      + '<h3>Compara un mismo tema en los 13 PAPS</h3>'
+      + '<p>Escribe un tema y verás, servicio por servicio, qué dice cada Programa Anual.</p>'
+      + '<p style="margin-top:14px">'+['incendio','sismo','falla del SIC','inundación','falta de personal','robo','evacuación','entrega de turno','capacitación','inventario'].map(function(x){
+          return '<button class="fbtn" style="margin:3px" onclick="setQuery(\''+x+'\')">'+x+'</button>'; }).join('')+'</p></div>';
+    return;
+  }
+  var res = search(q, {svc:null, sec:ST.sec, kind:ST.kind});
+  var by = {};
+  res.forEach(function(r){ (by[r.p.svc] || (by[r.p.svc]=[])).push(r); });
+  byId('tSub').textContent = res.length.toLocaleString('es-CL')+' coincidencias · '
+    + Object.keys(by).length+' de '+SERVICES.length+' servicios lo abordan';
+
+  byId('themeGrid').innerHTML = SERVICES.map(function(s){
+    var hits = by[s.id]||[];
+    var body;
+    if(!PAPS.docs[s.id]) body = '<div class="tc-none">Documento PAPS no disponible</div>';
+    else if(!hits.length) body = '<div class="tc-none">Sin menciones para este término</div>';
+    else body = hits.slice(0,4).map(function(r){
+      return '<div class="tc-hit" data-svc="'+r.p.svc+'" data-b="'+r.p.b+'">'
+        + snippet(r.p.txt, q, 190) + '</div>'; }).join('');
+    return '<div class="tcard" style="--cc:'+CAT_COLOR[s.cat]+'">'
+      + (hits.length?'<span class="tc-n">'+hits.length+'</span>':'')
+      + '<h4>'+s.num+' · '+esc(s.short)+'</h4>'
+      + '<div class="tc-sub">'+CAT_NAME[s.cat]+' · v'+s.version+'</div>'
+      + body + '</div>';
+  }).join('');
+  Array.prototype.forEach.call(byId('themeGrid').querySelectorAll('.tc-hit'), function(el){
+    el.onclick = function(){ openDoc(el.getAttribute('data-svc'), +el.getAttribute('data-b'), q); };
+  });
+}
+
+/* ═══ VISTA: CRUCES ════════════════════════════════════════════ */
+function renderCruces(){
+  if(!PAPS) return;
+  var coord = PAPS.coord||[], normas = PAPS.normas||[];
+  var ids = SERVICES.map(function(s){return s.id;});
+  var edge = {};
+  coord.forEach(function(c){ edge[c.from+'>'+c.to]=c; });
+
+  var mx = '<table class="mx"><thead><tr><th></th>'
+    + ids.map(function(i){ return '<th class="rot"><div>'+i+'</div></th>'; }).join('')
+    + '</tr></thead><tbody>'
+    + ids.map(function(a){
+        return '<tr><th class="rowh">'+a+'</th>'
+          + ids.map(function(b){
+              if(a===b) return '<td class="self"></td>';
+              var e = edge[a+'>'+b];
+              if(!e) return '<td></td>';
+              var tip = (svcOf(a)||{}).short + ' → ' + (svcOf(b)||{}).short + '\n\n' + e.t.slice(0,320)
+                        + (e.t.length>320?'…':'');
+              return '<td class="on" data-svc="'+a+'" data-b="'+e.b+'" title="'+esc(tip)+'"></td>';
+            }).join('') + '</tr>';
+      }).join('') + '</tbody></table>';
+
+  var nHtml = normas.slice(0,400).map(function(n){
+    return '<div class="norm"><span class="ns" style="background:'+color(n.svc)+'">'+n.svc+'</span>'
+      + esc(n.t)+'</div>'; }).join('');
+
+  var platHtml = SERVICES.map(function(s){
+    var ps = PLAT[s.id]||[];
+    if(!ps.length) return '';
+    return '<div style="margin-bottom:13px"><div style="font-size:11.5px;font-weight:800;color:'+CAT_COLOR[s.cat]+';margin-bottom:5px">'
+      + s.num+' · '+esc(s.short)+'</div><div class="plat-chips">'
+      + ps.map(function(p){ return '<a class="plat" href="'+p[0]+'"><span class="pdot" style="background:'+CAT_COLOR[s.cat]+'"></span>'+esc(p[1])+'</a>'; }).join('')
+      + '</div></div>';
+  }).join('');
+
+  byId('xGrid').innerHTML =
+      '<div class="panel"><h3>Coordinación entre servicios</h3>'
+    + '<div class="ph-sub">'+coord.length+' vínculos declarados en la sección «Coordinación con otros Servicios de Explotación». '
+    + 'La fila es el servicio que coordina; la columna, con quién. Haz clic en una celda para leer el texto.</div>'
+    + '<div class="matrix">'+mx+'</div></div>'
+    + '<div class="panel"><h3>Plataformas del HUB relacionadas</h3>'
+    + '<div class="ph-sub">Dónde continúa en el HUB la información de cada PAPS.</div>'
+    + platHtml + '</div>'
+    + '<div class="panel" style="grid-column:1/-1"><h3>Normativa y documentos citados</h3>'
+    + '<div class="ph-sub">'+normas.length+' referencias normativas y contractuales extraídas de las secciones «Documentos Relacionados» y «Normativa».</div>'
+    + '<div class="normlist">'+nHtml+'</div></div>';
+
+  Array.prototype.forEach.call(byId('xGrid').querySelectorAll('td.on'), function(el){
+    el.onclick = function(){ openDoc(el.getAttribute('data-svc'), +el.getAttribute('data-b')); };
+  });
+}
+
+/* ═══ VISTA: AUDITORÍA ═════════════════════════════════════════ */
+var AUD = window.SHARED_PAPS_AUDIT || null;
+var audFilter = 'all';
+
+function renderAuditoria(){
+  var host = byId('audHost');
+  if(!AUD){
+    host.innerHTML = '<div class="warn"><b>Falta el archivo de auditoría.</b> '
+      + 'No se encontró <code>SHARED_DATA/paps_audit.js</code>.</div>';
+    return;
+  }
+  var H = AUD.hallazgos;
+  var svcList = SERVICES.filter(function(s){ return PAPS.docs[s.id]; });
+  var ids = svcList.map(function(s){return s.id;});
+  function th(i){ var s=svcOf(i); return '<th title="'+esc(s.short)+'"><span style="color:'+CAT_COLOR[s.cat]+'">'+s.num+'</span><br>'+i+'</th>'; }
+  var nAlta = H.filter(function(f){return f.sev==='alta';}).length;
+  var nMed  = H.filter(function(f){return f.sev==='media';}).length;
+  var nBaja = H.filter(function(f){return f.sev==='baja';}).length;
+
+  var html = '<div class="aud-kpis">'
+    + kpi(H.length, 'hallazgos totales', '#1D2D5B')
+    + kpi(nAlta, 'severidad alta', '#dc2626')
+    + kpi(nMed, 'severidad media', '#d97706')
+    + kpi(nBaja, 'severidad baja', '#94a3b8')
+    + kpi(AUD.n_procs, 'procedimientos analizados', '#0d9488')
+    + kpi(AUD.definiciones_divergentes.length, 'términos con definición divergente', '#7c3aed')
+    + '</div>';
+
+  /* matriz de contingencias */
+  html += '<div class="aud-sec"><h3>Cobertura de contingencias</h3>'
+    + '<div class="as-sub">Qué familia de contingencia contempla cada PAPS, leyendo la matriz de contingencias, '
+    + 'los procedimientos de la familia CG y todo el texto del Plan de Contingencia. '
+    + 'Verde = presente (clic para ir al documento). Rojo = sin mención.</div>'
+    + '<div class="cov"><table class="cov"><thead><tr><th class="rowh">Familia de contingencia</th>'
+    + ids.map(th).join('') + '<th>cobertura</th></tr></thead><tbody>';
+  AUD.familias.forEach(function(f){
+    var row = AUD.matriz_contingencias[f] || {};
+    var n = ids.filter(function(i){ return row[i]; }).length;
+    html += '<tr><th class="rowh">'+esc(f)+'</th>'
+      + ids.map(function(i){
+          return row[i] ? '<td class="yes" data-svc="'+i+'" data-b="'+row[i]+'" title="'+esc(f+' · '+i)+'">●</td>'
+                        : '<td class="no" title="Sin mención">·</td>';
+        }).join('')
+      + '<td class="cov-n">'+n+'/'+ids.length+'</td></tr>';
+  });
+  html += '</tbody></table></div></div>';
+
+  /* completitud estructural */
+  var secs = Object.keys(AUD.sec_label).filter(function(k){
+    return AUD.estructura[ids[0]] && (k in AUD.estructura[ids[0]]); });
+  html += '<div class="aud-sec"><h3>Completitud estructural</h3>'
+    + '<div class="as-sub">Bloques de contenido por sección canónica en cada PAPS. Rojo = sección ausente o casi vacía.</div>'
+    + '<div class="cov"><table class="cov"><thead><tr><th class="rowh">Sección</th>'
+    + ids.map(th).join('') + '</tr></thead><tbody>';
+  secs.forEach(function(s){
+    html += '<tr><th class="rowh">'+esc(AUD.sec_label[s]||s)+'</th>'
+      + ids.map(function(i){
+          var n = (AUD.estructura[i]||{})[s]||0;
+          return '<td class="'+(n>=2?'yes':'no')+'" style="font-size:10.5px;font-weight:700">'+(n||'—')+'</td>';
+        }).join('') + '</tr>';
+  });
+  html += '</tbody></table></div></div>';
+
+  /* tablas normalizadas */
+  html += '<div class="aud-sec"><h3>Tablas normalizadas presentes</h3>'
+    + '<div class="as-sub">Cada PAPS debería traer el mismo set de tablas. Rojo = no se detecta.</div>'
+    + '<div class="cov"><table class="cov"><thead><tr><th class="rowh">Tabla</th>'
+    + ids.map(th).join('') + '</tr></thead><tbody>'
+    + Object.keys(AUD.tbl_label).map(function(k){
+        return '<tr><th class="rowh">'+esc(AUD.tbl_label[k])+'</th>'
+          + ids.map(function(i){
+              var n=(AUD.tablas[i]||{})[k]||0;
+              return '<td class="'+(n?'yes':'no')+'" style="font-size:10.5px;font-weight:700">'+(n||'—')+'</td>';
+            }).join('')+'</tr>';
+      }).join('')
+    + '</tbody></table></div></div>';
+
+  /* taxonomía de familias de procedimiento */
+  if(AUD.taxonomia){
+    var fams = Object.keys(AUD.fam_label);
+    var usadas = fams.filter(function(f){
+      return ids.some(function(i){ return (AUD.taxonomia[i]||[]).indexOf(f)>=0; }); });
+    html += '<div class="aud-sec"><h3>Familias de procedimiento por servicio</h3>'
+      + '<div class="as-sub">Cada PAPS clasifica sus procedimientos con su propia taxonomía. '
+      + 'Conviven dos esquemas: unos usan <b>OP</b> (operacional) y otros <b>PR/CO</b> '
+      + '(programado preventivo / correctivo) para lo mismo.</div>'
+      + '<div class="cov"><table class="cov"><thead><tr><th class="rowh">Familia</th>'
+      + ids.map(th).join('') + '<th>uso</th></tr></thead><tbody>'
+      + usadas.map(function(f){
+          var n = ids.filter(function(i){ return (AUD.taxonomia[i]||[]).indexOf(f)>=0; }).length;
+          return '<tr><th class="rowh"><code style="font-size:11px">'+f+'</code> · '
+            + esc(AUD.fam_label[f])+'</th>'
+            + ids.map(function(i){
+                var on = (AUD.taxonomia[i]||[]).indexOf(f)>=0;
+                return '<td class="'+(on?'yes':'no')+'">'+(on?'●':'·')+'</td>';
+              }).join('') + '<td class="cov-n">'+n+'/'+ids.length+'</td></tr>';
+        }).join('')
+      + '</tbody></table></div></div>';
+  }
+
+  /* definiciones divergentes */
+  html += '<div class="aud-sec"><h3>Términos definidos de forma distinta</h3>'
+    + '<div class="as-sub">'+AUD.definiciones_divergentes.length
+    + ' términos del glosario tienen redacciones que no coinciden entre servicios. '
+    + 'Es el tipo de divergencia que produce interpretaciones distintas de una misma obligación contractual.</div>'
+    + AUD.definiciones_divergentes.slice(0,12).map(function(dv){
+        return '<div class="dl2"><b>'+esc(dv.term)+'</b> — '+dv.variantes.length+' redacciones'
+          + '<div style="margin-top:5px">'
+          + dv.variantes.map(function(v){
+              return '<div style="margin:4px 0;padding-left:9px;border-left:2px solid '+color(v.svc)+'">'
+                + '<span class="cmp-svc" style="background:'+color(v.svc)+'">'+v.svc+'</span> '
+                + '<span style="cursor:pointer" class="defgo" data-svc="'+v.svc+'" data-b="'+v.b+'">'
+                + esc(v.def.slice(0,220))+(v.def.length>220?'…':'')+'</span></div>';
+            }).join('')
+          + '</div></div>';
+      }).join('')
+    + '</div>';
+
+  /* funciones con nombres distintos */
+  html += '<div class="aud-sec"><h3>Una misma función, nombres distintos</h3>'
+    + '<div class="as-sub">Funciones que todos los servicios ejecutan pero codifican con denominaciones diferentes. '
+    + 'Estandarizarlas simplifica el SIC, la fiscalización y el cruce de indicadores.</div>'
+    + AUD.funciones.map(function(fn){
+        return '<div class="dl2"><b>'+esc(fn.funcion)+'</b> · '+fn.svcs.length+' servicios · '
+          + fn.variantes.length+' denominaciones<div style="margin-top:4px">'
+          + fn.variantes.map(function(v){ return '<span class="varchip">'+esc(v)+'</span>'; }).join('')
+          + '</div></div>';
+      }).join('')
+    + '</div>';
+
+  /* hallazgos */
+  html += '<div class="aud-sec"><h3>Hallazgos</h3>'
+    + '<div class="as-sub">'+H.length+' hallazgos ordenados por severidad. '
+    + 'Los que apuntan a un punto concreto del documento son navegables.</div>'
+    + '<div style="margin-bottom:11px">'
+    + ['all','alta','media','baja'].map(function(s){
+        var n = s==='all'?H.length:H.filter(function(f){return f.sev===s;}).length;
+        return '<button class="fbtn'+(audFilter===s?' on':'')+'" data-sev="'+s+'" style="margin-right:5px">'
+          + (s==='all'?'Todos':s)+'<span class="n">'+n+'</span></button>'; }).join('')
+    + '</div><div id="findList">'
+    + H.filter(function(f){ return audFilter==='all' || f.sev===audFilter; })
+       .map(function(f){
+         return '<div class="find sev-'+f.sev+'"><div class="ft">'
+           + '<span class="sev">'+f.sev+'</span><span class="dim">'+esc(f.dim)+'</span>'
+           + '<span class="tt">'+esc(f.titulo)+'</span>'
+           + (f.svc && f.b ? '<span class="go" data-svc="'+f.svc+'" data-b="'+f.b+'">ver en el PAPS →</span>' : '')
+           + '</div><div class="dd">'+esc(f.detalle)+'</div></div>';
+       }).join('')
+    + '</div></div>';
+
+  host.innerHTML = html;
+
+  Array.prototype.forEach.call(host.querySelectorAll('[data-sev]'), function(b){
+    b.onclick = function(){ audFilter = b.getAttribute('data-sev'); renderAuditoria(); };
+  });
+  Array.prototype.forEach.call(host.querySelectorAll('.find .go, td.yes, .defgo'), function(el){
+    el.onclick = function(){
+      var s = el.getAttribute('data-svc'), b = el.getAttribute('data-b');
+      if(s && b) openDoc(s, +b);
+    };
+  });
+}
+function kpi(n, label, c){
+  return '<div class="kpi" style="--kc:'+c+'"><div class="kn">'+n+'</div><div class="kl">'+label+'</div></div>';
+}
+
+/* ═══ VISTA: LECTOR ════════════════════════════════════════════ */
+function openDoc(id, block, hl){
+  if(!PAPS || !PAPS.docs[id]) return;
+  ST.docId = id; ST.docHl = hl||'';
+  setView('doc', true);
+  renderDoc();
+  if(block) setTimeout(function(){ gotoBlock(block); }, 30);
+  else window.scrollTo({top:0});
+  syncURL();
+}
+function renderDoc(){
+  var id = ST.docId, s = svcOf(id);
+  var meta = PAPS.servicios.filter(function(x){return x.id===id;})[0];
+  var blocks = PAPS.docs[id], cc = CAT_COLOR[s.cat];
+  var hl = ST.docHl;
+
+  byId('toc').innerHTML = '<div class="toc-h">Índice · '+id+'</div>'
+    + meta.toc.filter(function(t){ return t.l<=4; }).map(function(t){
+        return '<a href="#" class="l'+t.l+'" data-b="'+t.i+'">'+esc(t.t)+'</a>'; }).join('');
+  Array.prototype.forEach.call(byId('toc').querySelectorAll('a'), function(a){
+    a.onclick = function(e){ e.preventDefault(); gotoBlock(+a.getAttribute('data-b')); };
+  });
+
+  var out = ['<div class="doc-hd" style="--cc:'+cc+'"><div class="n">'+s.num+'</div>'
+    + '<div><h2>'+esc(s.short)+'</h2><div class="meta">'+CAT_NAME[s.cat]+' · versión '+s.version
+    + ' · '+s.status+' · '+meta.nWords.toLocaleString('es-CL')+' palabras · '+meta.nTbl+' tablas · '+meta.nImg+' figuras</div>'
+    + '<div class="meta" style="margin-top:2px;color:#94a3b8">Fuente: '+esc(meta.file)+'</div></div>'
+    + '<div class="doc-tools">'
+    + (PLAT[id]||[]).map(function(p){ return '<a class="plat" href="'+p[0]+'">'+esc(p[1])+'</a>'; }).join('')
+    + '</div></div>'];
+
+  var inList = false;
+  function closeList(){ if(inList){ out.push('</ul>'); inList=false; } }
+  blocks.forEach(function(b){
+    var anchor = ' id="b'+b.i+'"';
+    if(b.k==='li'){
+      if(!inList){ out.push('<ul class="dl">'); inList=true; }
+      out.push('<li class="d"'+anchor+'>'+mark(b.t,hl)+'</li>');
+      return;
+    }
+    closeList();
+    if(b.k==='h'){
+      var lv = Math.min(b.lvl,5);
+      out.push('<h'+lv+' class="d"'+anchor+' style="--cc:'+cc+'">'+mark(b.t,hl)+'</h'+lv+'>');
+    } else if(b.k==='p'){
+      out.push('<p class="d"'+anchor+'>'+mark(b.t,hl)+'</p>');
+    } else if(b.k==='img'){
+      out.push(figure(b.src, b.t, anchor));
+    } else if(b.k==='tbl'){
+      out.push(tableHTML(b, hl, anchor));
+    }
+  });
+  closeList();
+  byId('docBody').innerHTML = out.join('');
+  enrich(byId('docBody'));
+  bindZoom();
+  observeToc();
+}
+
+/* ── códigos de procedimiento navegables + siglas con tooltip ────── */
+var ENRICH_RE = /(CSSO[-–][A-Za-z]{2,6}[-–]P[-–][A-Za-z]{2}[-–]\d{2,3})|(\b[A-ZÁÉÍÓÚÑ]{2,6}\b)/g;
+function enrich(root){
+  var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(n){
+      var p = n.parentNode;
+      if(!p || !n.nodeValue || n.nodeValue.length<2) return NodeFilter.FILTER_REJECT;
+      var tag = p.nodeName;
+      if(tag==='A'||tag==='SCRIPT'||tag==='STYLE'||p.classList.contains('pcode')) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  var nodes=[], n;
+  while((n = walker.nextNode())) nodes.push(n);
+  nodes.forEach(function(node){
+    var txt = node.nodeValue;
+    if(!/[A-Z]{2}/.test(txt)) return;
+    ENRICH_RE.lastIndex = 0;
+    var m, frag=null, last=0, any=false;
+    while((m = ENRICH_RE.exec(txt))){
+      var isCode = !!m[1];
+      var word = m[0];
+      if(!isCode && !ACRO_MAP[word.toUpperCase()]) continue;
+      if(!frag) frag = document.createDocumentFragment();
+      if(m.index>last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
+      var el = document.createElement('span');
+      if(isCode){
+        el.className = 'pcode';
+        el.setAttribute('data-code', word);
+        el.title = 'Buscar este procedimiento en los 13 PAPS';
+      } else {
+        var a = ACRO_MAP[word.toUpperCase()];
+        el.className = 'acro';
+        el.title = a.nombre + (a.definicion ? '\n\n'+a.definicion.slice(0,300) : '');
+      }
+      el.textContent = word;
+      frag.appendChild(el);
+      last = m.index + word.length;
+      any = true;
+    }
+    if(any){
+      if(last<txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
+      node.parentNode.replaceChild(frag, node);
+    }
+  });
+  Array.prototype.forEach.call(root.querySelectorAll('.pcode'), function(el){
+    el.onclick = function(){ setQuery(el.getAttribute('data-code')); };
+  });
+}
+function mark(t, hl){ return hl ? highlight(t, hl) : esc(t); }
+function figure(src, cap, anchor){
+  var isSvg = /\.svg$/.test(src);
+  return '<div class="figure'+(isSvg?' flow':'')+'"'+(anchor||'')+'>'
+    + '<img class="zoom" loading="lazy" src="'+ASSETS+src+'" alt="'+esc(cap||'Figura')+'">'
+    + (cap ? '<div class="figcap">'+esc(cap)+'</div>' : '')
+    + '</div>';
+}
+function tableHTML(b, hl, anchor){
+  var rows = b.rows||[], imgs = b.imgs||[];
+  var imgAt = {};
+  imgs.forEach(function(i){ (imgAt[i.r+'|'+i.c] || (imgAt[i.r+'|'+i.c]=[])).push(i.src); });
+  var cap = b.tk && b.tk!=='otra' ? '<div class="tblcap">'+ (CMP_LABEL[b.tk]||b.tk) +'</div>' : '';
+  var h = '<div class="tblwrap"'+(anchor||'')+'>'+cap+'<table class="ptbl"><thead><tr>'
+    + (rows[0]||[]).map(function(c){ return '<th>'+mark(c,hl)+'</th>'; }).join('')
+    + '</tr></thead><tbody>';
+  for(var r=1;r<rows.length;r++){
+    h += '<tr>' + rows[r].map(function(c,ci){
+      var extra = (imgAt[r+'|'+ci]||[]).map(function(s){
+        return '<img class="zoom" loading="lazy" style="max-width:180px;display:block;margin-top:5px" src="'+ASSETS+s+'">'; }).join('');
+      return '<td>'+mark(c,hl)+extra+'</td>';
+    }).join('') + '</tr>';
+  }
+  h += '</tbody></table></div>';
+  // encabezado con imágenes (fila 0)
+  (imgAt['0|0']||[]).forEach(function(){});
+  return h;
+}
+function gotoBlock(i){
+  var el = byId('b'+i);
+  if(!el){ window.scrollTo({top:0}); return; }
+  var y = el.getBoundingClientRect().top + window.scrollY - 150;
+  window.scrollTo({top:y, behavior:'smooth'});
+  el.style.transition='background .3s'; el.style.background='#fff7d6';
+  setTimeout(function(){ el.style.background=''; }, 1800);
+  var a = byId('toc').querySelector('a[data-b="'+i+'"]');
+  if(a){ setTocActive(a); a.scrollIntoView({block:'nearest'}); }
+}
+function setTocActive(a){
+  Array.prototype.forEach.call(byId('toc').querySelectorAll('a.on'), function(x){ x.classList.remove('on'); });
+  if(a) a.classList.add('on');
+}
+var tocObs = null;
+function observeToc(){
+  if(tocObs) tocObs.disconnect();
+  var heads = Array.prototype.slice.call(byId('docBody').querySelectorAll('h1.d,h2.d,h3.d,h4.d'));
+  tocObs = new IntersectionObserver(function(ents){
+    ents.forEach(function(e){
+      if(e.isIntersecting){
+        var id = e.target.id.replace('b','');
+        var a = byId('toc').querySelector('a[data-b="'+id+'"]');
+        if(a) setTocActive(a);
+      }
+    });
+  }, {rootMargin:'-150px 0px -70% 0px'});
+  heads.forEach(function(h){ tocObs.observe(h); });
+}
+
+/* ── lightbox ── */
+function bindZoom(){
+  Array.prototype.forEach.call(document.querySelectorAll('.zoom'), function(img){
+    img.onclick = function(){
+      byId('lboxIn').innerHTML = '<img src="'+img.getAttribute('src')+'">';
+      byId('lbox').classList.add('open');
+    };
+  });
+}
+byId('lbox').onclick = function(){ this.classList.remove('open'); };
+
+/* ═══ FILTROS ══════════════════════════════════════════════════ */
+function renderFilters(){
+  var f = byId('frow'), html='';
+  if(ST.view==='servicios'){
+    html += '<span class="flab">Categoría</span>'
+      + fb('all', ST.cat==='all', 'Todas', 'cat')
+      + [1,2,3].map(function(c){ return fb(String(c), ST.cat===String(c), CAT_NAME[c], 'cat'); }).join('')
+      + '<span class="fsep"></span><span class="flab">Estado</span>'
+      + ['all','Congelado','En Actualización','En Desarrollo'].map(function(s){
+          return fb(s, ST.status===s, s==='all'?'Todos':s, 'status'); }).join('');
+  } else if(ST.view==='buscar' || ST.view==='tema'){
+    var fc = ST.q.trim() ? facets(ST.q, {svc:ST.svc, sec:ST.sec, kind:ST.kind}) : {sec:{},kind:{},svc:{}};
+    html += '<span class="flab">Servicio</span>'
+      + '<button class="fbtn'+(ST.svc.length?'':' on')+'" data-t="svcall">Todos</button>'
+      + SERVICES.filter(function(s){ return PAPS && PAPS.docs[s.id]; }).map(function(s){
+          var n = fc.svc[s.id]||0;
+          return '<button class="fbtn'+(ST.svc.indexOf(s.id)>=0?' on':'')+'" data-t="svc" data-v="'+s.id+'" title="'+esc(s.short)+'">'
+            + s.num+' '+s.id+(n?'<span class="n">'+n+'</span>':'')+'</button>';
+        }).join('');
+    if(ST.view==='buscar'){
+      html += '<span class="fsep"></span><span class="flab">Sección</span>'
+        + '<select class="fbtn" id="selSec" style="padding:5px 8px">'
+        + '<option value="all">Todas</option>'
+        + Object.keys(SEC_LABEL).filter(function(k){ return fc.sec[k]; }).map(function(k){
+            return '<option value="'+k+'"'+(ST.sec===k?' selected':'')+'>'+SEC_LABEL[k]+' ('+fc.sec[k]+')</option>'; }).join('')
+        + '</select>'
+        + '<span class="fsep"></span><span class="flab">Tipo</span>'
+        + ['all','p','tbl','h','img'].filter(function(k){ return k==='all'||fc.kind[k]; }).map(function(k){
+            return '<button class="fbtn'+(ST.kind===k?' on':'')+'" data-t="kind" data-v="'+k+'">'
+              + (k==='all'?'Todo':KIND_LABEL[k])+(fc.kind[k]?'<span class="n">'+fc.kind[k]+'</span>':'')+'</button>'; }).join('');
+    }
+  } else if(ST.view==='comparar'){
+    html += '<span class="flab">Servicio</span>'
+      + '<button class="fbtn'+(ST.svc.length?'':' on')+'" data-t="svcall">Todos</button>'
+      + SERVICES.filter(function(s){ return PAPS && PAPS.docs[s.id]; }).map(function(s){
+          return '<button class="fbtn'+(ST.svc.indexOf(s.id)>=0?' on':'')+'" data-t="svc" data-v="'+s.id+'" title="'+esc(s.short)+'">'
+            + s.num+' '+s.id+'</button>'; }).join('');
+  } else if(ST.view==='doc'){
+    html += '<span class="flab">Documento</span>'
+      + SERVICES.filter(function(s){ return PAPS && PAPS.docs[s.id]; }).map(function(s){
+          return '<button class="fbtn'+(ST.docId===s.id?' on':'')+'" data-t="doc" data-v="'+s.id+'" title="'+esc(s.short)+'">'
+            + s.num+' '+s.id+'</button>'; }).join('');
+  }
+  f.innerHTML = html;
+  f.style.display = html ? 'flex' : 'none';
+
+  Array.prototype.forEach.call(f.querySelectorAll('.fbtn[data-t]'), function(b){
+    b.onclick = function(){
+      var t = b.getAttribute('data-t'), v = b.getAttribute('data-v');
+      if(t==='cat'){ ST.cat=v; }
+      else if(t==='status'){ ST.status=v; }
+      else if(t==='svcall'){ ST.svc=[]; }
+      else if(t==='svc'){ var i=ST.svc.indexOf(v); if(i>=0) ST.svc.splice(i,1); else ST.svc.push(v); }
+      else if(t==='kind'){ ST.kind=v; }
+      else if(t==='doc'){ openDoc(v, null, ST.q); return; }
+      ST.limit=40; render();
+    };
+  });
+  var sel = byId('selSec');
+  if(sel) sel.onchange = function(){ ST.sec=sel.value; ST.limit=40; render(); };
+}
+function fb(v, on, label, t){
+  return '<button class="fbtn'+(on?' on':'')+'" data-t="'+t+'" data-v="'+v+'">'+esc(label)+'</button>';
+}
+
+/* ═══ ROUTER ═══════════════════════════════════════════════════ */
+function setView(v, silent){
+  ST.view = v;
+  Array.prototype.forEach.call(document.querySelectorAll('.vtab'), function(t){
+    t.classList.toggle('on', t.getAttribute('data-v')===v);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.view'), function(el){ el.classList.remove('on'); });
+  var host = byId('v-'+v); if(host) host.classList.add('on');
+  renderFilters();
+  if(!silent) syncURL();
+}
+function render(){
+  renderFilters();
+  if(ST.view==='servicios') renderServicios();
+  else if(ST.view==='buscar') renderBuscar();
+  else if(ST.view==='comparar') renderComparar();
+  else if(ST.view==='tema') renderTema();
+  else if(ST.view==='cruces') renderCruces();
+  else if(ST.view==='auditoria') renderAuditoria();
+  else if(ST.view==='doc' && ST.docId) renderDoc();
+}
+function syncURL(){
+  var p = new URLSearchParams();
+  if(ST.view!=='servicios') p.set('vista', ST.view);
+  if(ST.q) p.set('q', ST.q);
+  if(ST.view==='doc' && ST.docId) p.set('svc', ST.docId);
+  if(ST.view==='comparar' && ST.cmp) p.set('set', ST.cmp);
+  var s = p.toString();
+  history.replaceState(null,'', s ? '?'+s : location.pathname);
+}
+function setQuery(v){
+  byId('q').value = v; ST.q = v; ST.limit=40;
+  if(ST.view==='servicios' || ST.view==='cruces') setView('buscar');
+  render();
+}
+
+/* ═══ EVENTOS ══════════════════════════════════════════════════ */
+Array.prototype.forEach.call(document.querySelectorAll('.vtab'), function(t){
+  t.onclick = function(){ setView(t.getAttribute('data-v')); render(); };
+});
+var qTimer=null;
+byId('q').addEventListener('input', function(e){
+  var v = e.target.value;
+  byId('qclear').style.display = v ? 'block' : 'none';
+  clearTimeout(qTimer);
+  qTimer = setTimeout(function(){
+    ST.q = v; ST.limit = 40;
+    if(v && (ST.view==='servicios' || ST.view==='cruces')) setView('buscar', true);
+    render(); syncURL();
+  }, 130);
+});
+byId('qclear').onclick = function(){
+  byId('q').value=''; ST.q=''; this.style.display='none'; render(); syncURL();
+};
+byId('rMore').onclick = function(){ ST.limit += 60; renderBuscar(); };
+document.addEventListener('keydown', function(e){
+  if(e.key==='/' && document.activeElement.tagName!=='INPUT' && document.activeElement.tagName!=='SELECT'){
+    e.preventDefault(); byId('q').focus();
+  }
+  if(e.key==='Escape'){ byId('lbox').classList.remove('open'); }
+});
+
+/* ═══ MODO PÚBLICO ═════════════════════════════════════════════ */
+var PUBLIC_BUILD = true; /*__PUBLIC_FLAG__*/
+var PUBLIC = PUBLIC_BUILD || new URLSearchParams(location.search).get('public')==='1';
+
+/* ═══ INIT ═════════════════════════════════════════════════════ */
+(function init(){
+  var t0 = performance.now();
+  if(!PAPS){
+    byId('svcCats').innerHTML = '<div class="warn"><b>Falta el corpus.</b> No se encontró '
+      + '<code>SHARED_DATA/paps_full.js</code>. La plataforma funciona en modo índice: '
+      + 'se muestran los servicios pero no el contenido de los documentos.</div>';
+    PAPS = {servicios:[], docs:{}, cross:{}, coord:[], normas:[]};
+  } else {
+    buildPassages();
+    buildIndex();
+  }
+  var ms = Math.round(performance.now()-t0);
+
+  var nDocs = Object.keys(PAPS.docs).length;
+  var nWords = PAPS.servicios.reduce(function(a,s){return a+s.nWords;},0);
+  var nTbl = PAPS.servicios.reduce(function(a,s){return a+s.nTbl;},0);
+  var nImg = PAPS.servicios.reduce(function(a,s){return a+s.nImg;},0);
+  byId('statsChips').innerHTML = [
+    '<b>14</b> servicios', '<b>'+nDocs+'</b> PAPS cargados',
+    '<b>'+nWords.toLocaleString('es-CL')+'</b> palabras',
+    '<b>'+nTbl+'</b> tablas', '<b>'+nImg+'</b> figuras',
+    '<b>'+P.length.toLocaleString('es-CL')+'</b> pasajes indexados'
+  ].map(function(c){ return '<div class="hchip">'+c+'</div>'; }).join('');
+
+  var u = new URLSearchParams(location.search);
+  if(u.get('q')){ byId('q').value = u.get('q'); ST.q = u.get('q'); byId('qclear').style.display='block'; }
+  if(u.get('set')) ST.cmp = u.get('set');
+  if(u.get('categoria')) ST.cat = u.get('categoria');
+  var svc = u.get('svc');
+  if(svc && PAPS.docs[svc]){ openDoc(svc, u.get('b')?+u.get('b'):null, ST.q); return; }
+  var v = u.get('vista');
+  setView(v && byId('v-'+v) ? v : (ST.q ? 'buscar' : 'servicios'), true);
+  render();
+  if(window.console) console.log('[PAPS] índice listo en '+ms+' ms · '+P.length+' pasajes · '+Object.keys(IDX||{}).length+' términos');
+})();
+</script>
+<script src="hub-home.js"></script>
+
+<script src="metrics.js"></script>
+<script>if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){navigator.serviceWorker.register('sw.js').catch(function(){});}</script>
+</body>
+</html>

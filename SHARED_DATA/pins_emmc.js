@@ -271526,7 +271526,28 @@ window.PINS_EMMC = {
       "t_max_parada": "3 dias",
       "zonificacion": "Menos Critica"
     },
-    
+    {
+      "recinto_zona": "S1HDSPS1 UNIDAD MEDICINA TRASFUSIONAL",
+      "recinto_zona2": "Conservación Componentes Sanguineos",
+      "recinto_cod": "J.1.50.8.2",
+      "edif": "HDS",
+      "piso": "PS1",
+      "tipo_equipo": "70003",
+      "bim": "H2412",
+      "serie": "70003-0-1",
+      "nombre": "Esterilizador Oxido de Etileno",
+      "cantidad": 1,
+      "proveedor": "SIN PROVEEDOR",
+      "marca": "",
+      "modelo": "",
+      "pins": "SI",
+      "lugar": "SIN RECEPCION",
+      "estado": "SIN RECEPCION",
+      "pruebas": "PENDIENTE",
+      "cap_tipo": "AL PERSONAL",
+      "cap_hecha": "NO",
+      "acta": "PENDIENTE"
+    },
     {
       "recinto_zona": "S1HDSPS1 ANATOMIA PATOLOGICA",
       "recinto_zona2": "Bodega Corrosivos Inflamables",
