@@ -111,11 +111,22 @@ header .sub{font-size:11px;color:var(--muted)}
 .fl-btn:hover{color:var(--text);border-color:var(--cyan)}
 .fl-btn.on{background:rgba(34,211,238,.16);border-color:var(--cyan);color:var(--cyan)}
 .plan-hint{font-size:11px;color:var(--dim)}
-.plan-stage{position:relative;background:#fff;border:1px solid var(--border2);border-radius:12px;overflow:hidden}
-.plan-stage img{width:100%;display:block;user-select:none}
-.plan-stage svg{position:absolute;inset:0;width:100%;height:100%}
+.plan-stage{position:relative;background:#fff;border:1px solid var(--border2);border-radius:12px;overflow:hidden;cursor:grab;touch-action:none}
+.plan-stage.panning{cursor:grabbing}
+.plan-stage.placing{cursor:crosshair}
+#planWrap{position:relative;width:100%;transform-origin:0 0}
+#planWrap img{width:100%;display:block;user-select:none;-webkit-user-drag:none}
+#planWrap svg{position:absolute;inset:0;width:100%;height:100%}
+.plan-zoombar{position:absolute;right:10px;top:10px;display:flex;gap:3px;z-index:5;background:rgba(15,23,42,.78);border:1px solid #334155;border-radius:9px;padding:3px}
+.plan-zoombar button{width:28px;height:28px;border:none;border-radius:6px;background:transparent;color:#cbd5e1;font-size:15px;cursor:pointer;line-height:1}
+.plan-zoombar button:hover{background:#1e293b}
+.plan-zoombar .zlab{color:#94a3b8;font-size:10.5px;display:flex;align-items:center;padding:0 6px;min-width:42px;justify-content:center;font-variant-numeric:tabular-nums}
+.plan-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0 6px}
+.plan-tools select{background:var(--panel2,#0f1730);border:1px solid var(--border2);border-radius:8px;color:inherit;padding:6px 8px;font-size:12px;max-width:340px}
 .st-dot{cursor:pointer}
 .st-dot circle.c{stroke:#fff;stroke-width:2;filter:drop-shadow(0 1px 3px rgba(0,0,0,.4))}
+.st-dot.est circle.c{stroke-dasharray:3 3}          /* posición estimada (falta ubicar) */
+.st-dot.ovr circle.c{stroke:#22d3ee}                /* ajustada localmente, sin exportar */
 .st-dot text{font:700 11px 'Segoe UI',sans-serif;fill:#0f172a;stroke:#fff;stroke-width:3;paint-order:stroke;text-anchor:middle;pointer-events:none}
 .st-dot.dragging circle.c{stroke:#22d3ee;stroke-width:3}
 .tube{fill:none;stroke-linecap:round;opacity:.45}
@@ -181,11 +192,24 @@ header .sub{font-size:11px;color:var(--muted)}
       <div class="floor-btns" id="planFloors"></div>
       <div class="chip-row" id="planChips" style="margin:0"></div>
       <span class="plan-hint" id="planHint"></span>
+    </div>
+    <div class="plan-tools" id="planTools">
+      <select id="locSel" title="Estación a ubicar — ✎ ajustada local · ◌ estimada (falta ubicar) · ✓ posición del repo"></select>
+      <button class="btn" onclick="startPlace()" id="btnUbicar">🎯 Ubicar en el plano</button>
+      <button class="btn" onclick="resetFloorPos()" title="Quita los ajustes locales de este piso y vuelve a las posiciones del repositorio">↺ Restaurar piso</button>
       <button class="btn" id="btnExportPos" onclick="exportPos()" style="display:none">📥 Exportar posiciones</button>
     </div>
     <div class="plan-stage" id="planStage">
-      <img id="planImg" alt="Plano del piso" draggable="false">
-      <svg id="planOv" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="planWrap">
+        <img id="planImg" alt="Plano del piso" draggable="false">
+        <svg id="planOv" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div class="plan-zoombar">
+        <button onclick="pzStep(-1)" title="Alejar">−</button>
+        <span class="zlab" id="pzLab">100%</span>
+        <button onclick="pzStep(1)" title="Acercar">+</button>
+        <button onclick="pzReset()" title="Ajustar a la ventana (doble clic en el plano hace lo mismo)">⤢</button>
+      </div>
     </div>
   </div>
 
@@ -380,7 +404,7 @@ function renderPlanFloors(){
   document.getElementById('planChips').innerHTML=chips();
   const pc=document.getElementById('perspChips'); if(pc) pc.innerHTML=chips();
 }
-function setPlanFloor(f){ _planFloor=f; renderPlanFloors(); renderPlan(); }
+function setPlanFloor(f){ _planFloor=f; pzReset(); renderPlanFloors(); renderPlan(); }
 function setMapSys(s){ _mapSys=s; renderPlanFloors(); renderPlan();
   if(document.getElementById('view-persp').classList.contains('on')) buildPersp(); }
 function renderPlan(){
@@ -388,8 +412,10 @@ function renderPlan(){
   img.onload=()=>drawPlanOverlay();
   img.src='CABIDA_DATA/correo_plans/plan_'+_planFloor+'.webp';
   if(img.complete&&img.naturalWidth) drawPlanOverlay();
-  document.getElementById('planHint').textContent = PUBLIC?'':'✋ Arrastrá una estación para ajustar su posición (se guarda local)';
+  document.getElementById('planHint').textContent = PUBLIC?'':'✋ Arrastrá un punto para ajustarlo · rueda = zoom · arrastre del fondo = mover el plano';
+  const pt=document.getElementById('planTools'); if(pt) pt.style.display=PUBLIC?'none':'';
   const be=document.getElementById('btnExportPos'); if(be) be.style.display=PUBLIC?'none':'';
+  if(!PUBLIC) fillLocSel();
 }
 function drawPlanOverlay(){
   const img=document.getElementById('planImg'), ov=document.getElementById('planOv');
@@ -410,29 +436,38 @@ function drawPlanOverlay(){
   es.forEach(e=>{
     const p=getPos(e.id), col=SYS_HEX[e.sistema]||'#94a3b8';
     const r=e.tipo==='equipo_impulsion'?14:(e.tipo&&e.tipo.includes('masiv')?11:9);
-    h+=`<g class="st-dot" data-id="${e.id}" transform="translate(${p.nx*W},${p.ny*H})">
+    // estado visual: ✎ ajustada local (ovr) · ◌ estimada pendiente (est) · normal = del repo
+    const base=(window.CORREO_POS||{})[e.id];
+    const cls='st-dot'+(_posOverride[e.id]?' ovr':(base&&base.auto===0?' est':''));
+    h+=`<g class="${cls}" data-id="${e.id}" transform="translate(${p.nx*W},${p.ny*H})">
       <circle class="c" r="${r}" fill="${col}"><title>${esc(e.id)} · ${esc(e.nombre)}\n${esc(e.ubicacion||'')} · ${esc(e.servicio||'')}</title></circle>
       <text y="${r+13}">${esc(e.nombre)}</text></g>`;
   });
   ov.innerHTML=h;
   if(!PUBLIC) enablePlanDrag(W,H);
 }
+// Posición del cursor en coords normalizadas del PLANO (usa el rect de la
+// imagen, no del stage: exacto con cualquier nivel de zoom/paneo).
+function imgPoint(e){
+  const r=document.getElementById('planImg').getBoundingClientRect();
+  return { nx:Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)),
+           ny:Math.min(1,Math.max(0,(e.clientY-r.top)/r.height)) };
+}
 function enablePlanDrag(W,H){
-  const ov=document.getElementById('planOv'), stage=document.getElementById('planStage');
+  const ov=document.getElementById('planOv');
   ov.querySelectorAll('.st-dot').forEach(g=>{
     g.addEventListener('pointerdown',ev=>{
-      ev.preventDefault(); const id=g.dataset.id; g.classList.add('dragging');
+      ev.preventDefault(); ev.stopPropagation();   // que no panee el plano
+      const id=g.dataset.id; g.classList.add('dragging');
       const move=e2=>{
-        const r=stage.getBoundingClientRect();
-        const nx=Math.min(1,Math.max(0,(e2.clientX-r.left)/r.width));
-        const ny=Math.min(1,Math.max(0,(e2.clientY-r.top)/r.height));
-        _posOverride[id]={nx:+nx.toFixed(4),ny:+ny.toFixed(4)};
-        g.setAttribute('transform',`translate(${nx*W},${ny*H})`);
+        const p=imgPoint(e2);
+        _posOverride[id]={nx:+p.nx.toFixed(4),ny:+p.ny.toFixed(4)};
+        g.setAttribute('transform',`translate(${p.nx*W},${p.ny*H})`);
       };
       const up=()=>{ window.removeEventListener('pointermove',move); window.removeEventListener('pointerup',up);
         g.classList.remove('dragging');
         localStorage.setItem('correo_pos_override',JSON.stringify(_posOverride));
-        drawPlanOverlay(); };
+        drawPlanOverlay(); fillLocSel(); };
       window.addEventListener('pointermove',move); window.addEventListener('pointerup',up);
     });
   });
@@ -445,6 +480,99 @@ function exportPos(){
   const b=new Blob([js],{type:'text/javascript'}); const a=document.createElement('a');
   a.href=URL.createObjectURL(b); a.download='correo_neumatico_pos.js'; a.click(); URL.revokeObjectURL(a.href);
 }
+
+// ── ZOOM Y PANEO DEL PLANO ───────────────────────────────────────────────────
+// transform translate+scale sobre #planWrap; la rueda hace zoom anclado al
+// cursor, el arrastre del fondo panea, doble clic o ⤢ vuelven al ajuste.
+let _pz={z:1,ox:0,oy:0};
+function applyPZ(){
+  const w=document.getElementById('planWrap');
+  // límites: que el plano no se escape de la vista
+  const st=document.getElementById('planStage');
+  const bw=st.clientWidth, bh=w.offsetHeight*_pz.z;
+  _pz.ox=Math.min(0,Math.max(bw-bw*_pz.z,_pz.ox));
+  _pz.oy=Math.min(0,Math.max(Math.min(0,st.clientHeight-bh),_pz.oy));
+  w.style.transform=`translate(${_pz.ox}px,${_pz.oy}px) scale(${_pz.z})`;
+  const l=document.getElementById('pzLab'); if(l) l.textContent=Math.round(_pz.z*100)+'%';
+}
+function pzZoomAt(nz,cx,cy){
+  nz=Math.min(8,Math.max(1,nz));
+  const k=nz/_pz.z;
+  _pz.ox=cx-(cx-_pz.ox)*k; _pz.oy=cy-(cy-_pz.oy)*k; _pz.z=nz;
+  applyPZ();
+}
+function pzStep(d){
+  const st=document.getElementById('planStage');
+  pzZoomAt(_pz.z*(d>0?1.35:1/1.35), st.clientWidth/2, st.clientHeight/2);
+}
+function pzReset(){ _pz={z:1,ox:0,oy:0}; const w=document.getElementById('planWrap'); if(w) applyPZ(); }
+(function(){
+  const st=document.getElementById('planStage'); if(!st) return;
+  st.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const r=st.getBoundingClientRect();
+    const sens=e.ctrlKey?0.012:0.0035;                    // pinch trackpad vs rueda
+    let d=e.deltaY; if(e.deltaMode===1) d*=16;
+    pzZoomAt(_pz.z*Math.exp(-d*sens), e.clientX-r.left, e.clientY-r.top);
+  },{passive:false});
+  st.addEventListener('dblclick',e=>{ if(!e.target.closest('.st-dot')) pzReset(); });
+  st.addEventListener('pointerdown',e=>{
+    if(e.button!==0) return;
+    if(e.target.closest('.st-dot')||e.target.closest('.plan-zoombar')) return;
+    if(_placing){ placeAt(e); return; }                   // modo ubicar: el clic posiciona
+    const s={x:e.clientX,y:e.clientY,ox:_pz.ox,oy:_pz.oy};
+    st.classList.add('panning');
+    const move=e2=>{ _pz.ox=s.ox+(e2.clientX-s.x); _pz.oy=s.oy+(e2.clientY-s.y); applyPZ(); };
+    const up=()=>{ window.removeEventListener('pointermove',move); window.removeEventListener('pointerup',up); st.classList.remove('panning'); };
+    window.addEventListener('pointermove',move); window.addEventListener('pointerup',up);
+  });
+})();
+
+// ── HERRAMIENTAS DE UBICACIÓN ────────────────────────────────────────────────
+// Selector de estaciones del piso con su estado, "🎯 Ubicar" (el próximo clic
+// en el plano fija la posición exacta) y "↺ Restaurar piso".
+let _placing=false;
+function fillLocSel(){
+  const sel=document.getElementById('locSel'); if(!sel) return;
+  const cur=sel.value;
+  const es=EST.filter(e=>estFloor(e)===_planFloor).slice()
+    .sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
+  sel.innerHTML=es.map(e=>{
+    const base=(window.CORREO_POS||{})[e.id];
+    const mark=_posOverride[e.id]?'✎':(base?(base.auto===0?'◌':'✓'):'◌');
+    return `<option value="${e.id}">${mark} ${esc(e.nombre)} · ${e.id}</option>`;
+  }).join('');
+  if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
+}
+function startPlace(){
+  const sel=document.getElementById('locSel'); if(!sel||!sel.value) return;
+  _placing=true;
+  document.getElementById('planStage').classList.add('placing');
+  document.getElementById('planHint').textContent='🎯 Hacé clic en el plano donde va "'+(sel.options[sel.selectedIndex].text.replace(/^[✎◌✓] /,''))+'" · Esc cancela';
+}
+function placeAt(e){
+  const sel=document.getElementById('locSel'); const id=sel&&sel.value; if(!id) return;
+  const p=imgPoint(e);
+  _posOverride[id]={nx:+p.nx.toFixed(4),ny:+p.ny.toFixed(4)};
+  localStorage.setItem('correo_pos_override',JSON.stringify(_posOverride));
+  _placing=false;
+  document.getElementById('planStage').classList.remove('placing');
+  drawPlanOverlay(); fillLocSel();
+  document.getElementById('planHint').textContent='✔ Posición fijada — arrastrá el punto para afinar, o exportá para dejarla en el repo';
+}
+function resetFloorPos(){
+  const ids=EST.filter(e=>estFloor(e)===_planFloor).map(e=>e.id).filter(id=>_posOverride[id]);
+  if(!ids.length){ document.getElementById('planHint').textContent='Este piso no tiene ajustes locales.'; return; }
+  if(!confirm('¿Quitar los ajustes locales de '+ids.length+' estación(es) de este piso y volver a las posiciones del repositorio?')) return;
+  ids.forEach(id=>delete _posOverride[id]);
+  localStorage.setItem('correo_pos_override',JSON.stringify(_posOverride));
+  drawPlanOverlay(); fillLocSel();
+}
+window.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&_placing){ _placing=false;
+    document.getElementById('planStage').classList.remove('placing');
+    renderPlan(); }
+});
 
 // ── VISTA PERSPECTIVA ────────────────────────────────────────────────────────
 // Proyección afín: cada piso es un paralelogramo apilado; misma matriz para
@@ -464,7 +592,7 @@ function buildPersp(){
     const id=PLAN_FLOORS[fi][0], lb=PLAN_FLOORS[fi][1];
     const p00=proj(0,0,fi),p10=proj(1,0,fi),p11=proj(1,1,fi),p01=proj(0,1,fi);
     // imagen con transform afín (alto exacto del webp de cada piso)
-    const IH={'P-1':1227,'P1':1166,'P2':1168,'P3':1168,'P4':1169}[id]||1166;
+    const IH={'P-1':1227,'P1':1167,'P2':1169,'P3':1169,'P4':1169}[id]||1167;   // alto @1600 de los planos regenerados
     const a=(p10.x-p00.x)/1600, b=(p10.y-p00.y)/1600, c=(p01.x-p00.x)/IH, d=(p01.y-p00.y)/IH;
     h+=`<g opacity="${_mapSys?'.95':'1'}">
       <image class="pf-img" href="CABIDA_DATA/correo_plans/plan_${id}.webp" width="1600" height="${IH}"
@@ -544,7 +672,7 @@ function toggleSim(){
 // ── MODO PÚBLICO (consulta) — el deploy invierte PUBLIC_BUILD a true ─────────
 const PUBLIC_BUILD = true; /*__PUBLIC_FLAG__*/
 const PUBLIC = PUBLIC_BUILD || new URLSearchParams(location.search).get('public')==='1';
-function applyPublicMode(){ if(!PUBLIC) return; document.body.classList.add('public'); document.querySelectorAll('[onclick*="exportCSV"]').forEach(el=>el.remove()); }
+function applyPublicMode(){ if(!PUBLIC) return; document.body.classList.add('public'); document.querySelectorAll('[onclick*="exportCSV"]').forEach(el=>el.remove()); const pt=document.getElementById('planTools'); if(pt) pt.remove(); }
 function applyUrlFilter(){ const s=new URLSearchParams(location.search).get('sistema'); if(s&&typeof setSys==='function') setSys(s); }
 renderKpis(); fillFilters(); renderDir();
 applyPublicMode(); applyUrlFilter();
