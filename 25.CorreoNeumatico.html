@@ -9,8 +9,10 @@
 <link rel="shortcut icon" href="Logos%20HUB-HDS/favicon-nhds-azul-64.png">
 <link rel="apple-touch-icon" href="Logos%20HUB-HDS/favicon-nhds-azul-512.png">
 
-<script src="SHARED_DATA/correo_neumatico.js"></script>
-<script src="SHARED_DATA/correo_neumatico_pos.js"></script>
+<!-- datos con URL única por carga: ninguna caché puede servir versiones viejas
+     (el directorio v2 y las posiciones cambian durante la asignación manual) -->
+<script>document.write('<scr'+'ipt src="SHARED_DATA/correo_neumatico.js?v='+Date.now()+'"></scr'+'ipt>');
+document.write('<scr'+'ipt src="SHARED_DATA/correo_neumatico_pos.js?v='+Date.now()+'"></scr'+'ipt>');</script>
 <style>
 :root{
   --bg:#0b1228;--panel:#111a36;--panel2:#0f1730;--border:#1e293b;--border2:#28406b;
@@ -122,7 +124,22 @@ header .sub{font-size:11px;color:var(--muted)}
 .plan-zoombar button:hover{background:#1e293b}
 .plan-zoombar .zlab{color:#94a3b8;font-size:10.5px;display:flex;align-items:center;padding:0 6px;min-width:42px;justify-content:center;font-variant-numeric:tabular-nums}
 .plan-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0 6px}
-.plan-tools select{background:var(--panel2,#0f1730);border:1px solid var(--border2);border-radius:8px;color:inherit;padding:6px 8px;font-size:12px;max-width:340px}
+/* apartado INGER (fuera de alcance) al pie del directorio */
+.ing-note{grid-column:1/-1;margin-top:10px;padding:10px 14px;border:1px dashed var(--border2);border-radius:11px;font-size:11px;color:#94a3b8;line-height:1.7;opacity:.85}
+/* ── fila plano + barra lateral de asignación ── */
+.plan-row{display:flex;gap:10px;align-items:stretch}
+.plan-row .plan-stage{flex:1;min-width:0}
+.st-side{width:280px;flex-shrink:0;border:1px solid var(--border2);border-radius:12px;display:flex;flex-direction:column;overflow:hidden;max-height:72vh}
+.st-side .sthead{padding:9px 12px;font-size:11px;font-weight:800;border-bottom:1px solid var(--border2);letter-spacing:.3px}
+.st-side .stlist{overflow:auto;flex:1}
+.st-item{display:flex;gap:8px;align-items:flex-start;padding:7px 10px;font-size:11.5px;cursor:pointer;border-bottom:1px solid rgba(148,163,184,.15);line-height:1.35}
+.st-item:hover{background:rgba(56,189,248,.10)}
+.st-item.armed{background:rgba(56,189,248,.18);box-shadow:inset 2px 0 0 #38bdf8}
+.st-item.done{opacity:.75}
+.st-item.done .nm{text-decoration:none;color:#15803d}
+.st-item .sdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.st-item .nm{flex:1;font-weight:600}
+.st-item .sid{display:block;font-size:9.5px;color:#64748b;font-weight:400}
 .st-dot{cursor:pointer}
 .st-dot circle.c{stroke:#fff;stroke-width:2;filter:drop-shadow(0 1px 3px rgba(0,0,0,.4))}
 .st-dot.est circle.c{stroke-dasharray:3 3}          /* posición estimada (falta ubicar) */
@@ -194,22 +211,24 @@ header .sub{font-size:11px;color:var(--muted)}
       <span class="plan-hint" id="planHint"></span>
     </div>
     <div class="plan-tools" id="planTools">
-      <select id="locSel" title="Estación a ubicar — ✎ ajustada local · ◌ estimada (falta ubicar) · ✓ posición del repo"></select>
-      <button class="btn" onclick="startPlace()" id="btnUbicar">🎯 Ubicar en el plano</button>
-      <button class="btn" onclick="resetFloorPos()" title="Quita los ajustes locales de este piso y vuelve a las posiciones del repositorio">↺ Restaurar piso</button>
+      <button class="btn" onclick="resetFloorPos()" title="Quita las ubicaciones hechas en este piso para volver a asignarlas">↺ Restaurar piso</button>
       <button class="btn" id="btnExportPos" onclick="exportPos()" style="display:none">📥 Exportar posiciones</button>
     </div>
-    <div class="plan-stage" id="planStage">
-      <div id="planWrap">
-        <img id="planImg" alt="Plano del piso" draggable="false">
-        <svg id="planOv" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="plan-row">
+      <div class="plan-stage" id="planStage">
+        <div id="planWrap">
+          <img id="planImg" alt="Plano del piso" draggable="false">
+          <svg id="planOv" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <div class="plan-zoombar">
+          <button onclick="pzStep(-1)" title="Alejar">−</button>
+          <span class="zlab" id="pzLab">100%</span>
+          <button onclick="pzStep(1)" title="Acercar">+</button>
+          <button onclick="pzReset()" title="Ajustar a la ventana (doble clic en el plano hace lo mismo)">⤢</button>
+        </div>
       </div>
-      <div class="plan-zoombar">
-        <button onclick="pzStep(-1)" title="Alejar">−</button>
-        <span class="zlab" id="pzLab">100%</span>
-        <button onclick="pzStep(1)" title="Acercar">+</button>
-        <button onclick="pzReset()" title="Ajustar a la ventana (doble clic en el plano hace lo mismo)">⤢</button>
-      </div>
+      <!-- Barra lateral de asignación: clic en un punto → clic en el plano -->
+      <div class="st-side" id="stSide"></div>
     </div>
   </div>
 
@@ -248,8 +267,14 @@ header .sub{font-size:11px;color:var(--muted)}
 
 <script>
 const DATA = window.CORREO_NEUMATICO_DATA || {estaciones:[],sistemas:{},tipos_estacion:{},stats:{},especificaciones_tecnicas:{}};
-const EST = DATA.estaciones||[];
-const SYS = DATA.sistemas||{};
+// ── ALCANCE (jul-2026, decisión Matías): solo HDS y AA ──────────────────────
+// El correo del edificio INGER (9 estaciones, todo el sistema T4) no es
+// materia nuestra: queda APARTADO en EST_ING (nota al pie del directorio) y
+// fuera de conteos, filtros, planos, barra de asignación y perspectiva.
+const EST_ING = (DATA.estaciones||[]).filter(e=>e.edificio==='INGER');
+const EST = (DATA.estaciones||[]).filter(e=>e.edificio!=='INGER');
+const SYS = {};
+Object.keys(DATA.sistemas||{}).forEach(k=>{ if(EST.some(e=>e.sistema===k)) SYS[k]=DATA.sistemas[k]; });
 const TIPOS = DATA.tipos_estacion||{};
 const SYS_COLOR = {T1:'var(--t1)',T2:'var(--t2)',T3:'var(--t3)',T4:'var(--t4)',GEN:'var(--gen)'};
 let _sysFilter = ''; // chip de sistema activo
@@ -259,12 +284,12 @@ const uniq = arr => [...new Set(arr)].filter(Boolean).sort();
 
 // ── KPIs ──
 function renderKpis(){
-  const s = DATA.stats || {};
+  // conteos SIEMPRE desde EST (alcance HDS+AA), no desde DATA.stats (cubría las 44)
   const kpis = [
     ['Estaciones', EST.length],
-    ['Edificios', Object.keys(s.por_edificio||{}).length || uniq(EST.map(e=>e.edificio)).length],
+    ['Edificios', uniq(EST.map(e=>e.edificio)).length],
     ['Sistemas', Object.keys(SYS).length],
-    ['Servicios', s.servicios_cubiertos || uniq(EST.map(e=>e.servicio)).length]
+    ['Servicios', uniq(EST.map(e=>e.servicio)).length]
   ];
   document.getElementById('kpis').innerHTML = kpis.map(([l,n])=>`<div class="kpi"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
 }
@@ -295,7 +320,12 @@ function renderDir(){
     return true;
   });
   const grid=document.getElementById('dirGrid');
-  if(!rows.length){ grid.innerHTML='<div class="empty">Sin estaciones que coincidan con el filtro.</div>'; return; }
+  // apartado INGER: visibles como referencia, fuera del alcance y los conteos
+  const ingNote = EST_ING.length
+    ? '<div class="ing-note">🏛 <b>Apartado — Edificio INGER ('+EST_ING.length+' estaciones · sistema T4):</b> no es materia nuestra; se listan solo como referencia.<br>'
+      + EST_ING.map(e=>esc(e.id)+' · '+esc(e.nombre)).join('&ensp;—&ensp;')+'</div>'
+    : '';
+  if(!rows.length){ grid.innerHTML='<div class="empty">Sin estaciones que coincidan con el filtro.</div>'+ingNote; return; }
   grid.innerHTML = rows.map(e=>{
     const col = SYS_COLOR[e.sistema]||'#64748b';
     return `<div class="st" style="--c:${col}">
@@ -309,7 +339,7 @@ function renderDir(){
         <span class="bdg tipo">${esc(TIPOS[e.tipo]||e.tipo)}</span>
       </div>
     </div>`;
-  }).join('');
+  }).join('') + ingNote;
 }
 
 // ── Por sistema (esquema lógico) ──
@@ -382,16 +412,21 @@ function exportCSV(){
 const SYS_HEX={T1:'#a855f7',T2:'#38bdf8',T3:'#eab308',T4:'#fb923c',GEN:'#94a3b8'};
 const PLAN_FLOORS=[['P-1','PS1'],['P1','P1'],['P2','P2'],['P3','P3'],['P4','P4']];
 const estFloor=e=>e.piso==='PS1'?'P-1':e.piso;
-let _posOverride={}; try{_posOverride=JSON.parse(localStorage.getItem('correo_pos_override')||'{}');}catch(_){}
-function getPos(id){ return _posOverride[id]||((window.CORREO_POS||{})[id])||{nx:.5,ny:.5}; }
+// v2 (jul-2026): asignación manual desde cero — clave nueva de localStorage
+// para ignorar los ajustes de la etapa de posiciones automáticas descartada.
+let _posOverride={}; try{_posOverride=JSON.parse(localStorage.getItem('correo_pos_override_v2')||'{}');}catch(_){}
+// null = estación AÚN NO UBICADA (no se dibuja; se asigna desde la barra lateral)
+function getPos(id){ return _posOverride[id]||((window.CORREO_POS||{})[id])||null; }
 let _planFloor='P1', _mapSys='';
 
 // ── Troncales: columna vertical por sistema en el centroide de sus estaciones ─
+// (solo estaciones YA ubicadas; null si el sistema no tiene ninguna)
 function sysColumn(sys){
-  const es=EST.filter(e=>e.sistema===sys && e.tipo!=='equipo_impulsion');
-  if(!es.length) return {nx:.5,ny:.5};
-  let sx=0,sy=0; es.forEach(e=>{const p=getPos(e.id);sx+=p.nx;sy+=p.ny;});
-  return {nx:sx/es.length, ny:sy/es.length};
+  const ps=EST.filter(e=>e.sistema===sys && e.tipo!=='equipo_impulsion')
+    .map(e=>getPos(e.id)).filter(Boolean);
+  if(!ps.length) return null;
+  let sx=0,sy=0; ps.forEach(p=>{sx+=p.nx;sy+=p.ny;});
+  return {nx:sx/ps.length, ny:sy/ps.length};
 }
 const CENTRAL=()=>EST.find(e=>e.tipo==='equipo_impulsion')||EST[0];
 
@@ -412,10 +447,11 @@ function renderPlan(){
   img.onload=()=>drawPlanOverlay();
   img.src='CABIDA_DATA/correo_plans/plan_'+_planFloor+'.webp';
   if(img.complete&&img.naturalWidth) drawPlanOverlay();
-  document.getElementById('planHint').textContent = PUBLIC?'':'✋ Arrastrá un punto para ajustarlo · rueda = zoom · arrastre del fondo = mover el plano';
+  document.getElementById('planHint').textContent = PUBLIC?'':'✋ Elegí un punto en la barra derecha y hacé clic en el plano · rueda = zoom · arrastre = mover';
   const pt=document.getElementById('planTools'); if(pt) pt.style.display=PUBLIC?'none':'';
   const be=document.getElementById('btnExportPos'); if(be) be.style.display=PUBLIC?'none':'';
-  if(!PUBLIC) fillLocSel();
+  const ss=document.getElementById('stSide'); if(ss) ss.style.display=PUBLIC?'none':'';
+  if(!PUBLIC) fillStSide();
 }
 function drawPlanOverlay(){
   const img=document.getElementById('planImg'), ov=document.getElementById('planOv');
@@ -423,25 +459,27 @@ function drawPlanOverlay(){
   ov.setAttribute('viewBox',`0 0 ${W} ${H}`);
   const es=EST.filter(e=>estFloor(e)===_planFloor&&(!_mapSys||e.sistema===_mapSys));
   let h='';
-  // tubos del piso: estación → columna de su sistema
+  // tubos del piso: estación → columna de su sistema (solo estaciones YA ubicadas)
   es.forEach(e=>{ if(e.sistema==='GEN')return;
     const p=getPos(e.id), c=sysColumn(e.sistema);
+    if(!p||!c) return;
     h+=`<path class="tube" stroke="${SYS_HEX[e.sistema]}" stroke-width="3" d="M${p.nx*W},${p.ny*H} L${c.nx*W},${p.ny*H} L${c.nx*W},${c.ny*H}"/>`;
   });
   // nodo troncal por sistema presente en el piso
   [...new Set(es.map(e=>e.sistema))].filter(s=>s!=='GEN').forEach(s=>{
     const c=sysColumn(s);
-    h+=`<circle cx="${c.nx*W}" cy="${c.ny*H}" r="7" fill="${SYS_HEX[s]}" opacity=".9" stroke="#fff" stroke-width="1.5"/>`;
+    if(!c) return;
+    h+=`<circle cx="${c.nx*W}" cy="${c.ny*H}" r="5" fill="${SYS_HEX[s]}" opacity=".9" stroke="#fff" stroke-width="1.5"/>`;
   });
   es.forEach(e=>{
-    const p=getPos(e.id), col=SYS_HEX[e.sistema]||'#94a3b8';
-    const r=e.tipo==='equipo_impulsion'?14:(e.tipo&&e.tipo.includes('masiv')?11:9);
-    // estado visual: ✎ ajustada local (ovr) · ◌ estimada pendiente (est) · normal = del repo
-    const base=(window.CORREO_POS||{})[e.id];
-    const cls='st-dot'+(_posOverride[e.id]?' ovr':(base&&base.auto===0?' est':''));
+    const p=getPos(e.id); if(!p) return;   // sin ubicar: se asigna desde la barra lateral
+    const col=SYS_HEX[e.sistema]||'#94a3b8';
+    // radios reducidos 30% (jul-26): los dots cubrían demasiado plano
+    const r=e.tipo==='equipo_impulsion'?10:(e.tipo&&e.tipo.includes('masiv')?8:6.5);
+    const cls='st-dot'+(_posOverride[e.id]?' ovr':'');
     h+=`<g class="${cls}" data-id="${e.id}" transform="translate(${p.nx*W},${p.ny*H})">
       <circle class="c" r="${r}" fill="${col}"><title>${esc(e.id)} · ${esc(e.nombre)}\n${esc(e.ubicacion||'')} · ${esc(e.servicio||'')}</title></circle>
-      <text y="${r+13}">${esc(e.nombre)}</text></g>`;
+      <text y="${r+11}">${esc(e.nombre)}</text></g>`;
   });
   ov.innerHTML=h;
   if(!PUBLIC) enablePlanDrag(W,H);
@@ -466,8 +504,8 @@ function enablePlanDrag(W,H){
       };
       const up=()=>{ window.removeEventListener('pointermove',move); window.removeEventListener('pointerup',up);
         g.classList.remove('dragging');
-        localStorage.setItem('correo_pos_override',JSON.stringify(_posOverride));
-        drawPlanOverlay(); fillLocSel(); };
+        localStorage.setItem('correo_pos_override_v2',JSON.stringify(_posOverride));
+        drawPlanOverlay(); fillStSide(); };
       window.addEventListener('pointermove',move); window.addEventListener('pointerup',up);
     });
   });
@@ -528,50 +566,64 @@ function pzReset(){ _pz={z:1,ox:0,oy:0}; const w=document.getElementById('planWr
   });
 })();
 
-// ── HERRAMIENTAS DE UBICACIÓN ────────────────────────────────────────────────
-// Selector de estaciones del piso con su estado, "🎯 Ubicar" (el próximo clic
-// en el plano fija la posición exacta) y "↺ Restaurar piso".
-let _placing=false;
-function fillLocSel(){
-  const sel=document.getElementById('locSel'); if(!sel) return;
-  const cur=sel.value;
-  const es=EST.filter(e=>estFloor(e)===_planFloor).slice()
-    .sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
-  sel.innerHTML=es.map(e=>{
-    const base=(window.CORREO_POS||{})[e.id];
-    const mark=_posOverride[e.id]?'✎':(base?(base.auto===0?'◌':'✓'):'◌');
-    return `<option value="${e.id}">${mark} ${esc(e.nombre)} · ${e.id}</option>`;
-  }).join('');
-  if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
+// ── BARRA LATERAL DE ASIGNACIÓN ─────────────────────────────────────────────
+// Lista todos los puntos del piso (filtrable por sistema con los chips).
+// Flujo: clic en un punto de la barra → clic en el plano lo ubica → se arma
+// solo el SIGUIENTE punto sin ubicar (asignación en cadena). ✓ = ubicado.
+let _placing=false, _placingId=null;
+function _stationsFloor(){
+  return EST.filter(e=>estFloor(e)===_planFloor&&(!_mapSys||e.sistema===_mapSys))
+    .slice().sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
 }
-function startPlace(){
-  const sel=document.getElementById('locSel'); if(!sel||!sel.value) return;
-  _placing=true;
-  document.getElementById('planStage').classList.add('placing');
-  document.getElementById('planHint').textContent='🎯 Hacé clic en el plano donde va "'+(sel.options[sel.selectedIndex].text.replace(/^[✎◌✓] /,''))+'" · Esc cancela';
+function fillStSide(){
+  const host=document.getElementById('stSide'); if(!host) return;
+  const es=_stationsFloor();
+  const ubic=es.filter(e=>getPos(e.id)).length;
+  host.innerHTML='<div class="sthead">📍 Puntos del piso — '+ubic+' de '+es.length+' ubicados</div>'
+    +'<div class="stlist">'+es.map(e=>{
+      const p=getPos(e.id);
+      return '<div class="st-item'+(p?' done':'')+(_placingId===e.id?' armed':'')+'" onclick="armarPunto(\''+e.id+'\')" title="Clic acá y después clic en el plano">'
+        +'<span class="sdot" style="background:'+(SYS_HEX[e.sistema]||'#94a3b8')+'"></span>'
+        +'<span class="nm">'+(p?'✓ ':'◌ ')+esc(e.nombre)
+        +'<span class="sid">'+esc(e.id)+(e.ubicacion?' · '+esc(e.ubicacion):'')+'</span></span>'
+        +'</div>';
+    }).join('')+'</div>';
+}
+function armarPunto(id){
+  _placingId=(_placingId===id)?null:id;
+  _placing=!!_placingId;
+  document.getElementById('planStage').classList.toggle('placing',_placing);
+  document.getElementById('planHint').textContent=_placing
+    ? '🎯 Clic en el plano donde va el punto seleccionado · Esc cancela'
+    : '✋ Elegí un punto en la barra derecha · rueda = zoom · arrastre = mover el plano';
+  fillStSide();
 }
 function placeAt(e){
-  const sel=document.getElementById('locSel'); const id=sel&&sel.value; if(!id) return;
+  const id=_placingId; if(!id) return;
   const p=imgPoint(e);
   _posOverride[id]={nx:+p.nx.toFixed(4),ny:+p.ny.toFixed(4)};
-  localStorage.setItem('correo_pos_override',JSON.stringify(_posOverride));
-  _placing=false;
-  document.getElementById('planStage').classList.remove('placing');
-  drawPlanOverlay(); fillLocSel();
-  document.getElementById('planHint').textContent='✔ Posición fijada — arrastrá el punto para afinar, o exportá para dejarla en el repo';
+  localStorage.setItem('correo_pos_override_v2',JSON.stringify(_posOverride));
+  // asignación en cadena: se arma solo el siguiente sin ubicar
+  const next=_stationsFloor().find(x=>!getPos(x.id));
+  _placingId=next?next.id:null; _placing=!!_placingId;
+  document.getElementById('planStage').classList.toggle('placing',_placing);
+  drawPlanOverlay(); fillStSide();
+  document.getElementById('planHint').textContent=_placingId
+    ? '✔ Ubicado — ya quedó armado el siguiente punto de la barra (Esc para parar)'
+    : '✔ Piso completo · arrastrá cualquier punto para afinar y después 📥 Exportar posiciones';
 }
 function resetFloorPos(){
   const ids=EST.filter(e=>estFloor(e)===_planFloor).map(e=>e.id).filter(id=>_posOverride[id]);
-  if(!ids.length){ document.getElementById('planHint').textContent='Este piso no tiene ajustes locales.'; return; }
-  if(!confirm('¿Quitar los ajustes locales de '+ids.length+' estación(es) de este piso y volver a las posiciones del repositorio?')) return;
+  if(!ids.length){ document.getElementById('planHint').textContent='Este piso no tiene ubicaciones hechas.'; return; }
+  if(!confirm('¿Quitar las '+ids.length+' ubicación(es) hechas en este piso para asignarlas de nuevo?')) return;
   ids.forEach(id=>delete _posOverride[id]);
-  localStorage.setItem('correo_pos_override',JSON.stringify(_posOverride));
-  drawPlanOverlay(); fillLocSel();
+  localStorage.setItem('correo_pos_override_v2',JSON.stringify(_posOverride));
+  drawPlanOverlay(); fillStSide();
 }
 window.addEventListener('keydown',e=>{
-  if(e.key==='Escape'&&_placing){ _placing=false;
+  if(e.key==='Escape'&&_placing){ _placing=false; _placingId=null;
     document.getElementById('planStage').classList.remove('placing');
-    renderPlan(); }
+    fillStSide(); renderPlan(); }
 });
 
 // ── VISTA PERSPECTIVA ────────────────────────────────────────────────────────
@@ -592,7 +644,7 @@ function buildPersp(){
     const id=PLAN_FLOORS[fi][0], lb=PLAN_FLOORS[fi][1];
     const p00=proj(0,0,fi),p10=proj(1,0,fi),p11=proj(1,1,fi),p01=proj(0,1,fi);
     // imagen con transform afín (alto exacto del webp de cada piso)
-    const IH={'P-1':1227,'P1':1167,'P2':1169,'P3':1169,'P4':1169}[id]||1167;   // alto @1600 de los planos regenerados
+    const IH={'P-1':1228,'P1':1166,'P2':1169,'P3':1168,'P4':1169}[id]||1167;   // alto @1600 de los planos 4000px (jul-26)
     const a=(p10.x-p00.x)/1600, b=(p10.y-p00.y)/1600, c=(p01.x-p00.x)/IH, d=(p01.y-p00.y)/IH;
     h+=`<g opacity="${_mapSys?'.95':'1'}">
       <image class="pf-img" href="CABIDA_DATA/correo_plans/plan_${id}.webp" width="1600" height="${IH}"
@@ -603,33 +655,37 @@ function buildPersp(){
     const es=EST.filter(e=>estFloor(e)===id&&(!_mapSys||e.sistema===_mapSys));
     es.forEach(e=>{ if(e.sistema==='GEN')return;
       const p=getPos(e.id), cc=sysColumn(e.sistema);
+      if(!p||!cc) return;                           // sin ubicar aún
       const A=proj(p.nx,p.ny,fi), B=proj(cc.nx,p.ny,fi), C=proj(cc.nx,cc.ny,fi);
       h+=`<path class="ptube ramal" stroke="${SYS_HEX[e.sistema]}" d="M${A.x},${A.y} L${B.x},${B.y} L${C.x},${C.y}"/>`;
     });
     es.forEach(e=>{
-      const p=getPos(e.id), P=proj(p.nx,p.ny,fi), col=SYS_HEX[e.sistema]||'#94a3b8';
+      const p=getPos(e.id); if(!p) return;          // sin ubicar aún
+      const P=proj(p.nx,p.ny,fi), col=SYS_HEX[e.sistema]||'#94a3b8';
       const r=e.tipo==='equipo_impulsion'?8:(e.tipo&&e.tipo.includes('masiv')?6.5:5);
       h+=`<circle class="pn-dot" cx="${P.x}" cy="${P.y}" r="${r}" fill="${col}"><title>${esc(e.id)} · ${esc(e.nombre)}</title></circle>`;
       if(e.tipo==='equipo_impulsion') h+=`<text class="pn-lbl" x="${P.x+11}" y="${P.y+3}" style="font-size:11px;font-weight:800;fill:#67e8f9">CENTRAL DE IMPULSIÓN</text>`;
     });
   }
   // columnas troncales verticales por sistema + espina hacia la central en P-1
-  const cen=CENTRAL(), cp=getPos(cen.id), CEN=proj(cp.nx,cp.ny,0);
+  const cen=CENTRAL(), cp=getPos(cen.id), CEN=cp?proj(cp.nx,cp.ny,0):null;
   Object.keys(SYS).filter(s=>s!=='GEN'&&(!_mapSys||s===_mapSys)).forEach(s=>{
     const c=sysColumn(s);
+    if(!c) return;                                   // sistema sin estaciones ubicadas
     const pisos=[...new Set(EST.filter(e=>e.sistema===s).map(e=>FI[estFloor(e)]))];
     const top=Math.max(...pisos), bot=0;
     const A=proj(c.nx,c.ny,top), B=proj(c.nx,c.ny,bot);
     h+=`<path class="ptube troncal" stroke="${SYS_HEX[s]}" d="M${A.x},${A.y} L${B.x},${B.y}"/>`;
-    h+=`<path class="ptube espina" d="M${B.x},${B.y} L${CEN.x},${CEN.y}" stroke-dasharray="7 6"/>`;
+    if(CEN) h+=`<path class="ptube espina" d="M${B.x},${B.y} L${CEN.x},${CEN.y}" stroke-dasharray="7 6"/>`;
   });
   h+=`<g id="capsLayer"></g>`;
   svg.innerHTML=h;
 }
 // ── Simulación de cápsulas ───────────────────────────────────────────────────
 function rutaCapsula(){
-  const pool=EST.filter(e=>e.sistema!=='GEN'&&(!_mapSys||e.sistema===_mapSys));
-  if(pool.length<2) return null;
+  // solo entre estaciones YA ubicadas (y con central ubicada)
+  const pool=EST.filter(e=>e.sistema!=='GEN'&&(!_mapSys||e.sistema===_mapSys)&&getPos(e.id));
+  if(pool.length<2||!getPos(CENTRAL().id)) return null;
   const o=pool[Math.floor(Math.random()*pool.length)];
   let d=pool[Math.floor(Math.random()*pool.length)], tries=0;
   while(d.id===o.id&&tries++<9) d=pool[Math.floor(Math.random()*pool.length)];
@@ -672,11 +728,11 @@ function toggleSim(){
 // ── MODO PÚBLICO (consulta) — el deploy invierte PUBLIC_BUILD a true ─────────
 const PUBLIC_BUILD = true; /*__PUBLIC_FLAG__*/
 const PUBLIC = PUBLIC_BUILD || new URLSearchParams(location.search).get('public')==='1';
-function applyPublicMode(){ if(!PUBLIC) return; document.body.classList.add('public'); document.querySelectorAll('[onclick*="exportCSV"]').forEach(el=>el.remove()); const pt=document.getElementById('planTools'); if(pt) pt.remove(); }
+function applyPublicMode(){ if(!PUBLIC) return; document.body.classList.add('public'); document.querySelectorAll('[onclick*="exportCSV"]').forEach(el=>el.remove()); const pt=document.getElementById('planTools'); if(pt) pt.remove(); const ss=document.getElementById('stSide'); if(ss) ss.remove(); }
 function applyUrlFilter(){ const s=new URLSearchParams(location.search).get('sistema'); if(s&&typeof setSys==='function') setSys(s); }
 renderKpis(); fillFilters(); renderDir();
 applyPublicMode(); applyUrlFilter();
-document.getElementById('hdrSub').textContent = `${EST.length} estaciones · ${Object.keys(SYS).length} sistemas · ${uniq(EST.map(e=>e.edificio)).length} edificios`;
+document.getElementById('hdrSub').textContent = `${EST.length} estaciones · ${Object.keys(SYS).length} sistemas · HDS + AA (INGER fuera de alcance)`;
 </script>
 <script src="hub-home.js"></script>
 
