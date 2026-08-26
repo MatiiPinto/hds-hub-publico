@@ -149,6 +149,86 @@
   .me-trash{margin-top:auto;border:1px dashed #4a3740;border-radius:8px;padding:9px;font-size:11px;color:var(--danger);text-align:center;transition:.12s}
   .me-trash.over{background:rgba(224,107,107,.15);border-color:var(--danger)}
 
+
+  /* ══════════ QUIROBOX · COMPLEJO (gemelo digital del Piso 2) ══════════ */
+  #qbComplejo{position:fixed;inset:0;z-index:130;background:#070c14;color:#e7edf3;display:none;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    font-variant-numeric:tabular-nums}
+  #qbComplejo.show{display:block}
+  #cx-canvas{position:absolute;inset:0}
+  #cx-canvas canvas{display:block}
+  #cx-labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  .cx-error{padding:40px;color:#f87171}
+
+  #cx-top{position:absolute;top:0;left:0;right:0;height:62px;display:flex;align-items:center;gap:18px;
+    padding:0 18px;background:linear-gradient(180deg,rgba(7,12,20,.96),rgba(7,12,20,.55) 70%,transparent);
+    z-index:6}
+  .cx-brand{display:flex;align-items:center;gap:11px;flex:none}
+  .cx-dot{width:11px;height:11px;border-radius:50%;background:#2fb6a6;box-shadow:0 0 0 4px rgba(47,182,166,.18);
+    animation:cxlat 2.4s ease-in-out infinite}
+  @keyframes cxlat{0%,100%{opacity:1}50%{opacity:.35}}
+  .cx-brand h2{margin:0;font-size:14.5px;font-weight:700;letter-spacing:-.2px}
+  .cx-brand p{margin:1px 0 0;font-size:10.5px;color:#7d93ad}
+  .cx-kpis{display:flex;gap:8px;margin-left:6px}
+  .cx-kpi{background:rgba(255,255,255,.05);border:1px solid #1e3350;border-radius:10px;
+    padding:5px 13px;text-align:center;min-width:74px}
+  .cx-kpi b{display:block;font-size:17px;font-weight:800;line-height:1.15}
+  .cx-kpi span{font-size:9px;color:#7d93ad;text-transform:uppercase;letter-spacing:.6px}
+  .cx-tools{margin-left:auto;display:flex;gap:5px}
+  .cx-tools button{width:34px;height:34px;border-radius:9px;border:1px solid #1e3350;background:#0d1726;
+    color:#93a9c2;font-size:15px;cursor:pointer;font-family:inherit}
+  .cx-tools button:hover{border-color:#2fb6a6;color:#2fb6a6}
+  .cx-tools button.on{background:#14504a;border-color:#2fb6a6;color:#7fe6d8}
+
+  #cx-side{position:absolute;right:14px;top:74px;bottom:52px;width:280px;z-index:6;
+    background:rgba(9,16,27,.9);border:1px solid #16283f;border-radius:14px;
+    backdrop-filter:blur(9px);display:flex;flex-direction:column;overflow:hidden}
+  .cx-sec{padding:11px 12px;min-height:0;display:flex;flex-direction:column}
+  .cx-sec:first-child{flex:1}
+  .cx-sec h3{margin:0 0 8px;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;color:#6f88a4;font-weight:800}
+  #cx-list{overflow-y:auto;min-height:0}
+  #cx-list::-webkit-scrollbar{width:7px}
+  #cx-list::-webkit-scrollbar-thumb{background:#1e3350;border-radius:6px}
+  .cx-row{display:flex;align-items:center;gap:7px;padding:5px 7px;border-radius:8px;cursor:pointer;font-size:11.5px}
+  .cx-row:hover{background:#122036}
+  .cx-row i{width:7px;height:7px;border-radius:50%;flex:none}
+  .cx-row b{width:19px;font-weight:800;color:#cfe0f0}
+  .cx-r-esp{flex:1;color:#8ba2bb;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cx-r-est{font-size:10px;font-weight:700;white-space:nowrap}
+  .cx-r-t{width:36px;text-align:right;color:#6f88a4;font-size:10.5px}
+  #cx-leg{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px}
+  .cx-l{display:flex;align-items:center;gap:6px;font-size:10.5px;color:#93a9c2}
+  .cx-l i{width:9px;height:9px;border-radius:3px;flex:none}
+  .cx-l-sep{grid-column:1/-1;margin-top:7px;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#5a7290}
+
+  .cx-card{position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;width:132px;
+    background:rgba(10,18,30,.93);border:1px solid #22405f;border-radius:10px;overflow:hidden;
+    box-shadow:0 10px 26px rgba(0,0,0,.55);transition:transform .12s,border-color .12s}
+  .cx-card:hover,.cx-card.hl{border-color:#2fb6a6;transform:translate(-50%,-100%) scale(1.06)!important}
+  .cx-card{width:auto}
+  .cx-c-h{display:flex;align-items:center;gap:5px;padding:2px 6px;background:var(--c);color:#08131f;white-space:nowrap;line-height:1.35}
+  .cx-c-chip{margin-left:2px;font-size:10px;font-weight:800;opacity:.9}
+  .cx-c-b{display:none;width:132px}
+  .cx-card:hover .cx-c-b,.cx-card.hl .cx-c-b,#cx-labels.full .cx-c-b{display:block}
+  #cx-labels.full .cx-c-chip,.cx-card:hover .cx-c-chip{display:none}
+  .cx-card:not(:hover) .cx-c-e{display:none}
+  #cx-labels.full .cx-c-e,.cx-card:hover .cx-c-e{display:inline}
+  .cx-c-n{font-size:12px;font-weight:900;letter-spacing:-.4px}
+  .cx-c-e{font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;opacity:.88}
+  .cx-c-b{padding:5px 7px 6px}
+  .cx-c-esp{font-size:10px;color:#a8bed6;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cx-c-m{display:flex;gap:8px;font-size:10.5px;font-weight:700;color:#e7edf3}
+  .cx-c-t{margin-top:3px;font-size:9.5px;color:#f5b544}
+
+  #cx-demo{position:absolute;left:18px;bottom:44px;z-index:7;display:flex;align-items:baseline;gap:8px;
+    background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.5);color:#fcd34d;
+    border-radius:9px;padding:6px 12px;font-size:11px}
+  #cx-demo b{font-size:10.5px;letter-spacing:.6px}
+  #cx-demo span{color:#d9b06a;font-size:10.5px}
+  #cx-hint{position:absolute;left:0;right:0;bottom:0;height:34px;display:flex;align-items:center;
+    justify-content:center;font-size:10.5px;color:#6f88a4;background:linear-gradient(0deg,rgba(7,12,20,.9),transparent);z-index:5}
+  @media(max-width:900px){#cx-side{display:none}.cx-kpis{display:none}}
+
   /* ══════════ QUIROBOX · PANTALLA MAPA (planificación) ══════════ */
   #qbMap{position:fixed;inset:0;z-index:120;background:#eef2f7;color:#1e293b;overflow-y:auto;
     font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;flex-direction:column}
@@ -157,7 +237,11 @@
   .qbh-logo{width:40px;height:40px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;letter-spacing:-1px;flex-shrink:0}
   .qbh-title h1{font-size:19px;font-weight:800;letter-spacing:-.3px}
   .qbh-title p{font-size:11px;opacity:.72;margin-top:1px}
-  .qbh-chips{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap}
+  #qbBtnComplejo{margin-left:auto;background:#0f766e;border:1px solid #2fb6a6;color:#eafffb;
+    border-radius:10px;padding:9px 15px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;
+    box-shadow:0 3px 14px rgba(47,182,166,.3)}
+  #qbBtnComplejo:hover{background:#0d8b80}
+  .qbh-chips{display:flex;gap:7px;flex-wrap:wrap}
   .qbchip{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:4px 11px;font-size:11px;font-weight:600;white-space:nowrap}
   .qbchip.warn{background:rgba(239,68,68,.22);border-color:rgba(248,113,113,.5)}
   .qb-legend{background:#fff;border-bottom:1px solid #e2e8f0;display:flex;gap:16px;flex-wrap:wrap;padding:8px 26px;font-size:11px;align-items:center;flex-shrink:0}
@@ -271,12 +355,17 @@
   .qd-foot .d3{border-radius:9px;background:#3b82c4;color:#fff;font-weight:700;font-size:12px;padding:11px 14px}
   .qd-foot .d3:hover{background:#2f6ba3}
 </style>
+<script>document.write('<scr'+'ipt src="SHARED_DATA/pabellon_layout.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<script>document.write('<scr'+'ipt src="SHARED_DATA/pabellon_estado.js?v='+Date.now()+'"></scr'+'ipt>');</script>
 </head>
 <body>
+<div id="qbComplejo"></div>
+
 <div id="qbMap">
   <div class="qbh">
     <div class="qbh-logo">QB</div>
     <div class="qbh-title"><h1>QuiroBox · Pabellón Central HDS</h1><p>Herramienta de planificación quirúrgica · Piso 2, Nuevo Hospital del Salvador</p></div>
+    <button id="qbBtnComplejo" title="Ver el complejo quirúrgico completo en 3D, con el estado de cada pabellón">◪ Complejo 3D</button>
     <div class="qbh-chips" id="qbChips"></div>
   </div>
   <div class="qb-legend" id="qbLegend"></div>
@@ -305,6 +394,7 @@
         <button id="b-map" title="Volver al mapa de pabellones">← Mapa</button>
         <button id="b-reset" title="Vista inicial">⟲ Vista</button>
         <button id="b-top" title="Vista cenital">⊞ Planta</button>
+        <button id="b-front" title="Vista frontal fija (anteroposterior), como la imagen referencial del pabellón: cámara frente al muro de acceso, a altura de ojos. La orientación queda fija; la rueda sigue acercando. Volver a tocar o elegir otra vista la libera.">◫ Frontal AP</button>
       </div>
       <div class="grp">
         <button id="b-walls" class="on">▦ Muros</button>
@@ -1830,8 +1920,37 @@ bDaVinci.onclick=()=>{
   renderList();
 };
 
-document.getElementById('b-reset').onclick=()=>frameRoom();
+// ── Vista FRONTAL AP (anteroposterior) ──────────────────────────────────────
+// La toma de las imágenes referenciales: cámara centrada frente al muro de
+// acceso (+z, el de la puerta), a altura de ojos, mirando el fondo del
+// pabellón. El muro frontal se vuelve translúcido solo (autoWalls). Mientras
+// está activa la ORIENTACIÓN queda fija: se puede acercar con la rueda, pero
+// no orbitar; cualquier otra vista la libera.
+let vistaAP=false;
+function encuadreFrontal(){
+  // el aspect se toma del stage y no de camera.aspect: tras volver del mapa la
+  // cámara puede tener aspect NaN por un resize con el stage aún sin medir
+  const asp=(stage.clientWidth>0&&stage.clientHeight>0)?stage.clientWidth/stage.clientHeight:16/9;
+  const tv=Math.tan(THREE.MathUtils.degToRad(camera.fov)/2);
+  const hfov2=Math.atan(tv*asp);
+  let dist=Math.max((ROOM.w/2)/Math.tan(hfov2)*1.15, (ROOM.h/2)/tv*1.25, 3.2);
+  if(!isFinite(dist)) dist=ROOM.w*1.4;
+  camera.position.set(0, 1.65, ROOM.d/2 + dist);
+  controls.target.set(0, 1.35, 0);
+  if(!isFinite(camera.aspect)) { camera.aspect=asp; camera.updateProjectionMatrix(); }
+  controls.update();
+  if(typeof autoWalls==='function') autoWalls();   // recalcular translucidez YA
+}
+function setVistaAP(on){
+  vistaAP=on;
+  controls.enableRotate=!on;
+  document.getElementById('b-front').classList.toggle('on',on);
+  if(on) encuadreFrontal();
+}
+document.getElementById('b-front').onclick=()=>setVistaAP(!vistaAP);
+document.getElementById('b-reset').onclick=()=>{ setVistaAP(false); frameRoom(); };
 document.getElementById('b-top').onclick=()=>{
+  setVistaAP(false);
   camera.position.set(0.01,Math.max(ROOM.w,ROOM.d)*1.6,0.01); controls.target.set(0,0,0);
 };
 
@@ -1849,6 +1968,7 @@ function setPabellon(i){
   ROOM.w=p.w; ROOM.d=p.d; buildRoom();
   hw=ROOM.w/2; hd=ROOM.d/2;
   layoutPabellon(p);
+  if(typeof vistaAP!=='undefined'&&vistaAP) encuadreFrontal();
   dimEl.innerHTML=`◱ ${p.w.toFixed(2)} × ${p.d.toFixed(2)} m · ${p.sup.toFixed(1)} m²${p.approx?' *':''} · h 3,0 m`;
   dimEl.title=(p.approx?'* medida aproximada · '+(p.note||'variante del código '+p.code):'geometría real DXF · '+p.bim);
   pabSel.value=i;
@@ -2206,6 +2326,32 @@ window.addEventListener('keydown',e=>{ if(e.key==='Escape'&&qbDrawer.classList.c
 
 buildLegend(); buildStats(); buildSchematic(); buildSupport();
 window.QB={showRoom,showMap};
+window.QB.debugAP=()=>({cam:camera.position.toArray().map(x=>+x.toFixed(2)),
+  tgt:controls.target.toArray().map(x=>+x.toFixed(2)), aspect:+camera.aspect.toFixed(2),
+  walls:(wallGroup?wallGroup.children:[]).map(w=>({n:(w.userData.normal||{toArray:()=>[]}).toArray(),
+    op:+(((w.userData.mats||[])[0]||{}).opacity??1).toFixed(2), vis:w.visible}))});
+
+/* ── COMPLEJO 3D · gemelo digital del Piso 2 ──────────────────────────────
+   Vive en assets/quirobox-complejo.js y se carga la primera vez que se abre:
+   levantar 140 volúmenes cuesta, y la mayoría de las visitas a QuiroBox son
+   para la ficha de un pabellón, no para la vista de conjunto. */
+const cxHost=document.getElementById('qbComplejo');
+let cxApi=null;
+async function showComplejo(){
+  cxHost.classList.add('show');
+  if(!cxApi){
+    cxHost.innerHTML='<div style="position:absolute;inset:0;display:grid;place-items:center;color:#7d93ad;font-size:13px">Levantando el complejo…</div>';
+    const mod=await import('./assets/quirobox-complejo.js');
+    cxApi=mod.initComplejo(cxHost,{
+      onRoom(n){ hideComplejo(); showRoom(n); },
+      onBack(){ hideComplejo(); showMap(); } });
+    window.QB.cx=cxApi;
+  } else cxApi.resize();
+}
+function hideComplejo(){ cxHost.classList.remove('show'); }
+document.getElementById('qbBtnComplejo').onclick=showComplejo;
+window.addEventListener('keydown',e=>{ if(e.key==='Escape'&&cxHost.classList.contains('show')) hideComplejo(); });
+window.QB.showComplejo=showComplejo;
 
 renderList(); syncTop();
 buildRoom();

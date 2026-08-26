@@ -378,6 +378,14 @@ input[type=search]::placeholder, input[type=text]::placeholder { color: rgba(255
 .code-badge.adj .lbl{background:#86efac;color:#052e16}
 .code-badge.missing{background:#f8fafc;color:#94a3b8;border:1px dashed #cbd5e1;font-style:italic;font-weight:500}
 .code-page{font-size:9px;color:#64748b;font-family:-apple-system,sans-serif;margin-top:2px;font-style:italic}
+/* secciones inyectadas del modal: mismo aire lateral que el resto (24px) */
+#modalCatLink{padding:0 24px}
+#modalTraza{padding:0 24px}
+/* estado DataMatrix por pieza: marcadas/físicas del código */
+.dm-ok{color:#16a34a;font-weight:800;font-size:12px;white-space:nowrap}
+.dm-par{color:#d97706;font-weight:800;font-size:12px;white-space:nowrap}
+.dm-falta{color:#dc2626;font-weight:800;font-size:12px;white-space:nowrap}
+.dm-nd{color:#94a3b8;font-size:12px}
 
 /* CRONOGRAMA REVISIÓN INSTRUMENTAL Qx (jun–oct 26) */
 .crono-bar { background:#fff; border-bottom:1px solid var(--border); padding:10px 28px; display:flex; align-items:stretch; gap:0; overflow-x:auto; }
@@ -545,6 +553,7 @@ table.excel-tbl tr:nth-child(even) td{background:#f8fafc}
     <div class="modal-supplier" id="modalSupplier"></div>
     <div id="modalCatLink"></div>
     <div class="modal-catalog" id="modalCatalog"></div>
+    <div id="modalTraza" style="display:none;margin-bottom:14px"></div>
     <div class="modal-pieces" id="modalPieces"></div>
   </div>
 </div>
@@ -561,6 +570,7 @@ table.excel-tbl tr:nth-child(even) td{background:#f8fafc}
   </div>
 </div>
 <script src="data/quirurbox_adjudicado.js"></script>
+<script src="data/quirurbox_trazabilidad.js"></script>
 <script src="data/quirurbox_boxes.js"></script>
 <script src="data/quirurbox_catalogos.js"></script>
 <script src="data/quirurbox_iconos.js"></script>
@@ -855,10 +865,11 @@ function renderPieceCodes(box, piece){
   // Solo se muestra el codigo del producto ADJUDICADO (lo que efectivamente tenemos).
   const adjMap = (window.ADJUDICADO_DATA && window.ADJUDICADO_DATA[box.id]) || {};
   const adj = adjMap[String(piece.num)] || null;
+  // REF: código de referencia de la marca adjudicada (código CTAR), a secas —
+  // la cita de catálogo/página se quitó para dejar la columna limpia.
   let html = '<div class="code-cell">';
   if (adj && adj.cod_of) {
     html += '<span class="code-badge adj">' + adj.cod_of + '</span>';
-    if (adj.pagina) html += '<span class="code-page">📄 ' + adj.pagina + '</span>';
   } else {
     html += '<span class="code-badge missing">—</span>';
   }
@@ -923,15 +934,56 @@ function openModal(id){
       +`</div>`;
   } else { catEl.style.display='none'; }
 
+  // Trazabilidad DataMatrix (inventario físico pieza a pieza, abr-2026)
+  const trEl=document.getElementById('modalTraza');
+  const tz=(window.QUIRURBOX_TRAZA||{})[b.id];
+  if(trEl){
+    if(tz && (tz.tot||tz.cont)){
+      const pct=tz.tot?Math.round(tz.dm*100/tz.tot):0;
+      const chip=(n,lbl,col)=>n?`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:9px;padding:9px 12px;text-align:center;min-width:86px"><div style="font-size:19px;font-weight:800;color:${col}">${n.toLocaleString('es-CL')}</div><div style="font-size:10.5px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.3px">${lbl}</div></div>`:'';
+      const c=tz.cont;
+      trEl.style.display='block';
+      trEl.innerHTML=
+        `<div class="section-title" style="margin:6px 0 8px">🔗 Trazabilidad DataMatrix</div>`
+        +(tz.tot?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">`
+          +chip(tz.tot,'piezas físicas','#1e293b')+chip(tz.dm,'con DataMatrix','#16a34a')
+          +chip(tz.sin_qr,'sin código QR','#d97706')+chip(tz.falta,'faltantes','#dc2626')
+          +chip(tz.pend,'pendientes','#64748b')+`</div>`
+          +`<div style="height:8px;border-radius:6px;overflow:hidden;display:flex;background:#e2e8f0;margin-bottom:8px" title="${pct}% marcado">`
+          +`<i style="width:${pct}%;background:#16a34a"></i><i style="width:${tz.tot?Math.round(tz.sin_qr*100/tz.tot):0}%;background:#d97706"></i><i style="width:${tz.tot?Math.round(tz.falta*100/tz.tot):0}%;background:#dc2626"></i></div>`
+          +`<div style="font-size:12px;color:#64748b">${pct}% del inventario físico marcado`
+          +(tz.actas?` · ${tz.actas} acta${tz.actas===1?'':'s'} RPI`:'')
+          +(tz.fecha_ultima_acta?` · última acta ${tz.fecha_ultima_acta}`:'')
+          +(tz.no_marcable?` · ${tz.no_marcable} pieza${tz.no_marcable===1?'':'s'} no marcable${tz.no_marcable===1?'':'s'}`:'')+`</div>`:'')
+        +(c?`<div style="font-size:12.5px;color:#334155;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;margin-top:8px">📦 <b>Contenedor:</b> ${c.por_caja||'—'} por caja · ${c.total||'—'} en total`
+          +(c.tamano?` · ${c.tamano}`:'')+(c.talla?` · talla <b>${c.talla}</b>`:'')
+          +(c.vol_m3?` · ${c.vol_m3} m³`:'')+`</div>`:'');
+    } else trEl.style.display='none';
+  }
+
   // Piezas
   const piecesEl=document.getElementById('modalPieces');
   if(b.pieces&&b.pieces.length>0){
-    const rows=b.pieces.map(p=>{
+    const adjMap=(window.ADJUDICADO_DATA&&window.ADJUDICADO_DATA[b.id])||{};
+    const tzCods=((window.QUIRURBOX_TRAZA||{})[b.id]||{}).cods||{};
+    const ckey=s=>String(s||'').replace(/[^0-9A-Za-z]/g,'').toUpperCase();
+    const rows=b.pieces.map((p,idx)=>{
       const parsed=parsePiece(p.description);
+      // orden acordado: primero la FUNCIÓN, después la medida principal (y
+      // secundarias), y al final el atributo (curva, recta, angulada…)
       const dimTags=parsed.dims.map(d=>`<span class="ptag ptag-dim">⟺ ${d}</span>`).join('');
       const angTag=parsed.ang?`<span class="ptag ptag-ang">↗ ${parsed.ang}</span>`:'';
       const fnTag=parsed.fn?`<span class="ptag ptag-func">✦ ${parsed.fn}</span>`:'';
-      const tags=dimTags+angTag+fnTag;
+      const tags=fnTag+dimTags+angTag;
+      // Datamatrix: piezas físicas marcadas / registradas de este código CTAR
+      const adj=adjMap[String(p.num)]||null;
+      const tc=adj&&adj.cod_of?tzCods[ckey(adj.cod_of)]:null;
+      let dmCell='<span class="dm-nd">—</span>';
+      if(tc){
+        const [ft,fm,ff]=tc;
+        const cls=ff>0?'dm-falta':(fm>=ft?'dm-ok':'dm-par');
+        dmCell=`<span class="${cls}" title="${fm} de ${ft} piezas físicas con código Datamatrix${ff?` · ${ff} faltante${ff===1?'':'s'}`:''}">${fm}/${ft}${ff?' ⚠':(fm>=ft?' ✓':'')}</span>`;
+      }
       const eyeSvg=`<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="8" cy="8" r="2.5" fill="currentColor"/></svg>`;
       const cube3dSvg=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`;
       const pn3d = JSON.stringify(parsed.nombre||p.description);
@@ -939,15 +991,16 @@ function openModal(id){
         ?`<td class="td-img" style="white-space:nowrap"><button class="eye-btn" onclick="showPieceImg('${p.image_url}')" title="Ver foto" style="color:#1d4ed8">${eyeSvg}</button><button class="view3d-btn" onclick="show3DView(${pn3d})" title="Ver en 3D">${cube3dSvg}</button></td>`
         :`<td class="td-img" style="white-space:nowrap"><button class="eye-btn no-img" style="color:#94a3b8" title="Sin foto">${eyeSvg}</button><button class="view3d-btn" onclick="show3DView(${pn3d})" title="Ver en 3D">${cube3dSvg}</button></td>`;
       return`<tr>
-        <td class="td-num">${p.num}</td>
+        <td class="td-num">${idx+1}</td>
         <td class="td-qty">${p.qty||'—'}</td>
         <td class="td-desc"><div class="piece-name">${parsed.nombre||p.description}</div>${tags?`<div class="piece-tags">${tags}</div>`:''}</td>
         <td class="td-ref">${renderPieceCodes(b, p)}</td>
+        <td class="td-dm" style="text-align:center">${dmCell}</td>
         ${imgCell}
       </tr>`;
     }).join('');
     piecesEl.innerHTML=`<div class="pieces-title"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#1d4ed8" stroke-width="1.5"/><path d="M5 8h6M5 5h6M5 11h4" stroke="#1d4ed8" stroke-width="1.5" stroke-linecap="round"/></svg>Contenido de la Caja<span class="pieces-count">${b.pieces.length} piezas</span></div>
-    <table class="pieces-table"><thead><tr><th>N°</th><th>Cant.</th><th>Instrumento</th><th>Cód. adjudicado</th><th style="width:36px"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2.5" fill="currentColor"/></svg></th></tr></thead><tbody>${rows}</tbody></table>`;
+    <table class="pieces-table"><thead><tr><th>Item</th><th>Cant.</th><th>Instrumento</th><th>REF</th><th style="text-align:center">Datamatrix</th><th style="width:36px"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2.5" fill="currentColor"/></svg></th></tr></thead><tbody>${rows}</tbody></table>`;
   } else {
     piecesEl.innerHTML=`<p class="no-pieces">Detalle de piezas no disponible aún.</p>`;
   }
